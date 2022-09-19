@@ -1,30 +1,35 @@
 import { Figure } from "./Figure";
 
 export class Pawn extends Figure {
-  constructor(color, cell) {
+  constructor(color, cell, playerFigure) {
     super("pawn", color, cell, `${color}_pawn`);
     this.startingPosition = true;
+    this.playerFigure = playerFigure;
   }
 
   validateMove(toPlacecell, isForHighlight) {
-
-    const verticalDiff = this.color === 'white' ? this.cell.x - toPlacecell.x :  toPlacecell.x - this.cell.x;
+    const verticalDiff =
+      this.color === "white"
+        ? this.cell.x - toPlacecell.x
+        : toPlacecell.x - this.cell.x;
     const horizontalDiff = Math.abs(this.cell.y - toPlacecell.y);
 
-    if(isForHighlight){      
-      if(Math.abs(verticalDiff) > 2 || (horizontalDiff > 0 && Math.abs(verticalDiff) > 1) || horizontalDiff > 1 || verticalDiff <= 0){
-        return null
-      } 
+    const board = this.cell.board.cells;
+
+    if (isForHighlight) {
+      if (
+        Math.abs(verticalDiff) > 2 ||
+        (horizontalDiff > 0 && Math.abs(verticalDiff) > 1) ||
+        horizontalDiff > 1 ||
+        verticalDiff <= 0
+      ) {
+        return null;
+      }
     }
-    const board = this.cell.board.cells
 
-
-
-    let enPassantXCoord = toPlacecell.x - (this.color === 'white' ? -1 : 1)
-
-
-
-    
+    let enPassantXCoord = toPlacecell.x - (this.color === "white" ? -1 : 1);
+    enPassantXCoord =
+      enPassantXCoord >= 0 && enPassantXCoord < 8 ? enPassantXCoord : null;
 
     const standartMove =
       verticalDiff === 1 && horizontalDiff === 0 && !toPlacecell.figure;
@@ -35,62 +40,46 @@ export class Pawn extends Figure {
       toPlacecell.figure &&
       toPlacecell.figure.color !== this.color;
 
+    const enPassantMove = enPassantXCoord
+      ? toPlacecell.board.cells[enPassantXCoord][toPlacecell.y]?.figure
+          ?.enPassant &&
+        verticalDiff === 1 &&
+        (toPlacecell.y - this.cell.y === 1 || this.cell.y - toPlacecell.y === 1)
+      : false;
 
-    const enPassantMove =
-      toPlacecell.board.cells[enPassantXCoord][toPlacecell.y]?.figure
-        ?.enPassant &&
-      verticalDiff === 1 &&
-      (toPlacecell.y - this.cell.y === 1 || this.cell.y - toPlacecell.y === 1);
-
-    const twoCellsMove =
+    let twoCellsMove =
       verticalDiff === 2 && horizontalDiff === 0 && this.startingPosition;
-
-    if (isForHighlight) {
-      const coordsToHighlight = {
-        x: toPlacecell.x,
-        y: toPlacecell.y,
-        type: null,
-      };
-      if (standartMove || twoCellsMove || enPassantMove) coordsToHighlight.type = "dotHighlight";
-      if ( takeMove)
-        coordsToHighlight.type = `takeHighlight${toPlacecell.color}`;
-
-      return coordsToHighlight;
+    if (twoCellsMove) {
+      const xDiff = this.color === "white" ? 1 : -1;
+      twoCellsMove =
+        !board[this.cell.x - xDiff][this.cell.y].figure &&
+        !board[this.cell.x - (xDiff * 2)][this.cell.y].figure;
     }
 
+    if (isForHighlight) {
+      return this.getHighlightVerdict(toPlacecell, standartMove || twoCellsMove || enPassantMove, takeMove);
+    }
 
 
     if (twoCellsMove && !isForHighlight) this.enPassant = true;
 
-    if(enPassantMove) {
-      board[toPlacecell.x - (this.color === 'white' ? -1 : 1)][toPlacecell.y].placeFigure(null)
-    }
-    if(takeMove){
-      toPlacecell.placeFigure(null) }
-      
-    return standartMove || twoCellsMove || enPassantMove || takeMove
+    return [
+      standartMove || twoCellsMove || enPassantMove || takeMove,
+      enPassantMove,
+    ];
   }
-  makeMove(toPlaceCell, startingCell) {
+  makeMove(toPlaceCell, startingCell, enPassant) {
+    startingCell.placeFigure(null);
+    enPassant &&
+      this.cell.board.cells[toPlaceCell.x - (this.color === "white" ? -1 : 1)][
+        toPlaceCell.y
+      ].placeFigure(null);
+
     this.cell = toPlaceCell;
     this.cell.placeFigure(this);
-    this.cell.board.cells[+startingCell.x][+startingCell.y].placeFigure(null);
 
     if (this.startingPosition) this.startingPosition = false;
   }
 
-  getHighlightedCells() {
-    const allCells = this.cell.board.cells.flat(1);
 
-    const toHighlight = [
-      { x: this.cell.x, y: this.cell.y, type: "selfHighlight" },
-    ];
-
-    allCells.forEach((item) => {
-      const verdict = this.validateMove(item, true);
-      if (verdict?.type){
-        toHighlight.push(verdict);
-      } 
-    });
-    return toHighlight;
-  }
 }

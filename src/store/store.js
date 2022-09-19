@@ -2,7 +2,7 @@ import { configureStore, createSlice} from "@reduxjs/toolkit";
 const board = createSlice({
     name: 'board',
     initialState:{
-        toHighlight:[]
+        toHighlight:[],
     },
     reducers:{
         setToHighlightCells(state,payload){
