@@ -9,14 +9,17 @@ import {
   makeGhostPiece,
   pieceMoveHandler,
 } from "../src/store/interfaceLogic";
+import blackWon from "../src/assets/UI/blackWon.webp";
+import whiteWon from "../src/assets/UI/whiteWon.webp";
 import styles from "../src/board.module.css";
 
 export default function Home() {
   const [board, setBoard] = useState(null);
   const dispatch = useDispatch();
   const boardRef = useRef();
+  const [gameEnd, setGameEnd] = useState(false);
 
-  let startingCell=null
+  let startingCell = null;
 
   useEffect(() => {
     if (!board) {
@@ -25,36 +28,39 @@ export default function Home() {
       playingBoard.createFigures();
       setBoard(playingBoard);
     } else {
-    
+      if (board.gameEnd) {
+        setGameEnd(board.gameEnd);
+      }
     }
   }, [board]);
 
   function onClickHandler(e, figure, cell) {
     // if (!figure.playerFigure) return;
 
-    if(startingCell && startingCell.classList.contains(styles.greenblack)){
-      startingCell.classList.remove(styles.greenblack)
+    if (
+      startingCell &&
+      startingCell.classList.contains(styles.selfHighlightblack)
+    ) {
+      startingCell.classList.remove(styles.selfHighlightblack);
     }
-    if(startingCell && startingCell.classList.contains(styles.greenwhite)){
-      startingCell.classList.remove(styles.greenwhite)
+    if (
+      startingCell &&
+      startingCell.classList.contains(styles.selfHighlightwhite)
+    ) {
+      startingCell.classList.remove(styles.selfHighlightwhite);
     }
 
     const currPiece = e.target;
     const startingCoords = { x: e.target.x, y: e.target.y };
-     startingCell = document
+    startingCell = document
       .elementFromPoint(e.clientX, e.clientY)
       .closest("[data-type = cell]");
-      document.addEventListener(`mousemove`, onMouseMoveHandler);
+    document.addEventListener(`mousemove`, onMouseMoveHandler);
     currPiece.addEventListener(`mouseup`, onMouseUpHandler);
 
-    // console.log(startingCell)
-
-    if(!startingCell.classList.contains(styles[`${cell.color}lastmove`])){
-      startingCell.classList.add(styles[`green${cell.color}`]);
+    if (!startingCell.classList.contains(styles[`${cell.color}lastmove`])) {
+      startingCell.classList.add(styles[`selfHighlight${cell.color}`]);
     }
-
-    
-
 
     const ghostPiece = makeGhostPiece(figure.image, piecesImgs, styles.ghost);
     startingCell.append(ghostPiece.elem);
@@ -63,8 +69,6 @@ export default function Home() {
       e.clientX - 45 - startingCoords.x
     }px, ${e.clientY - 45 - startingCoords.y}px)`;
     currPiece.style.zIndex = "1000";
-
-  
 
     const toHighlight = figure.getHighlightedCells();
     dispatch(boardActions.setToHighlightCells(toHighlight));
@@ -83,6 +87,7 @@ export default function Home() {
         setBoard,
         dispatch,
         boardRef,
+        startingCell
       );
       ghostPiece.elem.remove();
       currPiece.removeEventListener(`mouseup`, onMouseUpHandler);
@@ -90,13 +95,20 @@ export default function Home() {
     }
   }
 
-
-
   return (
-    <div className="App">
+    <div className={styles.app}>
       <div ref={boardRef} className={styles.board}>
         <BoardComp fn={onClickHandler} board={board} />
       </div>
+      {gameEnd && (
+        <div className={styles.gameEnd}>
+          Игра Окончена! <hr /> Выиграли {gameEnd.winner}{" "}
+          <img
+            src={gameEnd.winner === "чёрные" ? blackWon.src : whiteWon.src}
+            alt=""
+          />
+        </div>
+      )}
     </div>
   );
 }

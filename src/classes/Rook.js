@@ -1,25 +1,25 @@
 import { Figure } from "./Figure";
 
 export class Rook extends Figure {
-  constructor(color, cell, playerFigure) {
+  constructor(color, cell, playerFigure,startingPosition) {
     super("rook", color, cell, `${color}_rook`);
-    this.startingPosition = true;
     this.playerFigure = playerFigure;
+    this.startingPosition = startingPosition
   }
 
-  validateMove(toPlaceCell, isForHighlight) {
+  validateMove(toPlaceCell, isForHighlight, isForLegality) {
     const xCoord = toPlaceCell.x;
     const yCoord = toPlaceCell.y;
 
     if (isForHighlight && xCoord !== this.cell.x && yCoord !== this.cell.y)
-      return null;
+      return false;
 
     let xDirection = true;
     let yDirection = true;
 
     const direction =
-      this.cell.x === toPlaceCell.x ? "x" : this.cell.y === yCoord ? "y" : null;
-    if (!isForHighlight) {
+      this.cell.x === toPlaceCell.x ? "x" : this.cell.y === yCoord ? "y" : false;
+    if (!isForHighlight && !isForLegality) {
       if (!direction || (xCoord === this.cell.x && yCoord === this.cell.y))
         return [false];
     }
@@ -52,8 +52,8 @@ export class Rook extends Figure {
       }
     }
     if (!direction) {
-      xDirection = null;
-      yDirection = null;
+      xDirection = false;
+      yDirection = false;
     }
 
     const standartMove = (xDirection || yDirection) && !toPlaceCell.figure;
@@ -62,10 +62,21 @@ export class Rook extends Figure {
       toPlaceCell.figure &&
       toPlaceCell.figure.color !== this.color;
 
-    if (isForHighlight) {
-      return this.getHighlightVerdict(toPlaceCell, standartMove, takeMove);
+    if (isForLegality) {
+      return standartMove || takeMove;
     }
 
-    return [standartMove || takeMove];
+    const illegalmove = this.cell.board.checkForIllegalMoves(toPlaceCell, this);
+
+    if (isForHighlight) {
+      return this.getHighlightVerdict(
+        toPlaceCell,
+        standartMove,
+        takeMove,
+        illegalmove
+      );
+    }
+
+    return [(standartMove || takeMove) && !illegalmove];
   }
 }

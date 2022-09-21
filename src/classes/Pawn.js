@@ -1,13 +1,13 @@
 import { Figure } from "./Figure";
 
 export class Pawn extends Figure {
-  constructor(color, cell, playerFigure) {
+  constructor(color, cell, playerFigure,startingPosition) {
     super("pawn", color, cell, `${color}_pawn`);
-    this.startingPosition = true;
+    this.startingPosition = startingPosition;
     this.playerFigure = playerFigure;
   }
 
-  validateMove(toPlacecell, isForHighlight) {
+  validateMove(toPlacecell, isForHighlight, isForLegality) {
     const verticalDiff =
       this.color === "white"
         ? this.cell.x - toPlacecell.x
@@ -23,7 +23,7 @@ export class Pawn extends Figure {
         horizontalDiff > 1 ||
         verticalDiff <= 0
       ) {
-        return null;
+        return false;
       }
     }
 
@@ -53,21 +53,39 @@ export class Pawn extends Figure {
       const xDiff = this.color === "white" ? 1 : -1;
       twoCellsMove =
         !board[this.cell.x - xDiff][this.cell.y].figure &&
-        !board[this.cell.x - (xDiff * 2)][this.cell.y].figure;
+        !board[this.cell.x - xDiff * 2][this.cell.y].figure;
     }
 
-    if (isForHighlight) {
-      return this.getHighlightVerdict(toPlacecell, standartMove || twoCellsMove || enPassantMove, takeMove);
+
+    if (isForLegality) {
+      return standartMove || twoCellsMove || enPassantMove || takeMove
     }
+
+    const illegalmove = this.cell.board.checkForIllegalMoves(toPlacecell,this) 
+
+    if (isForHighlight) {
+      return this.getHighlightVerdict(
+        toPlacecell,
+        standartMove || twoCellsMove || enPassantMove,
+        takeMove,
+        illegalmove
+      );
+    }
+
 
 
     if (twoCellsMove && !isForHighlight) this.enPassant = true;
 
     return [
-      standartMove || twoCellsMove || enPassantMove || takeMove,
+      (standartMove || twoCellsMove || enPassantMove || takeMove) && !illegalmove,
       enPassantMove,
     ];
   }
+
+
+
+
+
   makeMove(toPlaceCell, startingCell, enPassant) {
     startingCell.placeFigure(null);
     enPassant &&
@@ -80,6 +98,4 @@ export class Pawn extends Figure {
 
     if (this.startingPosition) this.startingPosition = false;
   }
-
-
 }

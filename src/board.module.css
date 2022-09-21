@@ -48,12 +48,12 @@
 }
 
 .green{
-    background-color: #052b0b98 !important
+    background-color: #052b0b98 
 }
-.greenwhite{
+.greenwhite,.selfHighlightwhite{
     background-color: #14551e80
 }
-.greenblack{
+.greenblack,.selfHighlightblack{
     background-color: #052b0b98
 }
 .green img{
@@ -101,4 +101,44 @@
 }
 .blacklastmove{
     background-color: rgba(71, 88, 6, 0.6)  
+}
+
+.checkedwhite{
+    background: radial-gradient(ellipse at center, red 0%, #e70000 25%, #f0d9b5 89%, #f0d9b5 100%) !important;
+}
+.checkedblack{
+    background: radial-gradient(ellipse at center, red 0%, #e70000 25%, #b58863 89%, #b58863 100%) !important;
+}
+.checkedwhite img,.checkedblack img{
+    background-color: transparent !important;
+    border-radius: 0 !important
+}
+
+.gameEnd{
+    font-size: 32px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%,-50%);
+    z-index: 5000;
+    background-color: gray;
+    color: white;
+    padding: 32px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 400px;
+}
+.gameEnd hr{
+    background-color: white;
+    width: 100%;
+}
+.gameEnd img{
+    margin-top: 32px;
+    max-width: 300px;
+}
+.app{
+    position: relative;
 }

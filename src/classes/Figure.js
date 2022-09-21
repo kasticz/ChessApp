@@ -27,6 +27,7 @@ export class Figure {
     startingCell.placeFigure(null);
     this.cell = toPlaceCell;
     this.cell.placeFigure(this);
+    
 
     if (this.startingPosition) this.startingPosition = false;
   }
@@ -34,7 +35,8 @@ export class Figure {
   getHighlightVerdict(
     toPlaceCell,
     dotHighlightCondition,
-    takeHighlightCondition
+    takeHighlightCondition,
+    checkIllegal
   ) {
     const coordsToHighlight = {
       x: toPlaceCell.x,
@@ -43,10 +45,12 @@ export class Figure {
     };
 
 
-    if (dotHighlightCondition) coordsToHighlight.type = "dotHighlight";
-    if (takeHighlightCondition) coordsToHighlight.type = `takeHighlight${toPlaceCell.color}`;
+    if (dotHighlightCondition && !checkIllegal) coordsToHighlight.type = "dotHighlight";
+    if (takeHighlightCondition && !checkIllegal) coordsToHighlight.type = `takeHighlight${toPlaceCell.color}`;
 
     return coordsToHighlight;
   }
+
+
 
 }

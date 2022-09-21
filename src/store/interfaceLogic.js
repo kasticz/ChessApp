@@ -75,6 +75,7 @@ export function endMoveHandler(
   setBoard,
   dispatch,
   boardRef,
+  startingCell
 ) {
   currPiece.style.zIndex = "100";
   currPiece.style.position = "static";
@@ -85,22 +86,30 @@ export function endMoveHandler(
     .elementFromPoint(e.clientX, e.clientY)
     ?.closest("[data-type = cell]");
   currPiece.style.display = "block";
+  if(!cellUnder) return
   const cellCoords = { x: +cellUnder.dataset.x, y: +cellUnder.dataset.y };
 
   const cellInBoard = board.cells[cellCoords.x][cellCoords.y];
-
+  
   const validationResult = figure.validateMove(cellInBoard);
 
+  
+  
+
   if (validationResult[0]) {
-    figure.makeMove(cellInBoard, cell,validationResult[1]);
+    const castlingCheck = figure.makeMove(cellInBoard, cell,validationResult[1]); 
     dispatch(boardActions.setToHighlightCells([]));
     setBoard((prevState) => {
-      const newBoard = new Board(prevState.cells, cell, cellInBoard);
+      const newBoard = new Board(prevState.cells,cell, castlingCheck?.newToPlaceCell || cellInBoard);
       newBoard.reapplyBoard()
+      newBoard.checkForChecks()
       return newBoard;
     });
   }
 
+
+  
+  boardRef.current.addEventListener(`mousedown`,withoudDraggingHandler)
   
 
   function withoudDraggingHandler(e){
@@ -112,7 +121,15 @@ export function endMoveHandler(
       cell.contains(styles.takeHighlightblack) ||
       cell.contains(styles.takeHighlightwhite);
 
+      if(startingCell && startingCell.classList.contains(styles.selfHighlightblack)){
+        startingCell.classList.remove(styles.selfHighlightblack)
+      }
+      if(startingCell && startingCell.classList.contains(styles.selfHighlightwhite)){
+        startingCell.classList.remove(styles.selfHighlightwhite)
+      }
+
     if(!isActive){
+
         dispatch(boardActions.setToHighlightCells([]))
     } else{
         endMoveWithoutDragging(e,figure,setBoard,figure.cell,dispatch)
@@ -120,7 +137,7 @@ export function endMoveHandler(
 
   }
 
-  boardRef.current.addEventListener(`mousedown`,withoudDraggingHandler)
+  
 }
 
 export function makeGhostPiece(image, piecesImgs, ghostStyle) {
@@ -139,10 +156,12 @@ function endMoveWithoutDragging(e, figure, setBoard, startingCell, dispatch) {
   const validation = figure.validateMove(toPlaceCell);
 
   if (validation[0]) {
-    figure.makeMove(toPlaceCell, startingCell,validation[1]);
+    const castlingCheck = figure.makeMove(toPlaceCell, startingCell,validation[1]);
+    console.log(castlingCheck)
     setBoard((prevState) => {
-      const newBoard = new Board(prevState.cells, startingCell, toPlaceCell);
+      const newBoard = new Board(prevState.cells,startingCell, castlingCheck?.newToPlaceCell || toPlaceCell);
       newBoard.reapplyBoard()
+      newBoard.checkForChecks()
       return newBoard;
     });
   }

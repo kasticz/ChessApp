@@ -112,7 +112,7 @@ function App() {
       const cellInBoard = board.cells[cellCoords.x][cellCoords.y];
 
       const validationResult = figure.validateMove(cellInBoard);
-      console.log(validationResult)
+     
 
       if (validationResult) {        
         figure.makeMove(cellInBoard, cell);

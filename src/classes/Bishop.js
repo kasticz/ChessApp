@@ -6,18 +6,19 @@ export class Bishop extends Figure {
     this.playerFigure = playerFigure;
   }
 
-  validateMove(toPlaceCell, isForHighlight) {
+  validateMove(toPlaceCell, isForHighlight,isForLegality) {
     const xCoord = toPlaceCell.x;
     const yCoord = toPlaceCell.y;
 
     const board = this.cell.board.cells;
+    
 
     if (
       this.cell.color !== toPlaceCell.color ||
       Math.abs(xCoord - this.cell.x) !== Math.abs(yCoord - this.cell.y) ||
       toPlaceCell === this.cell
     ) {
-      return isForHighlight ? false : [false];
+      return isForHighlight || isForLegality ? false : [false];
     }
 
     const minXCell = toPlaceCell.x > this.cell.x ? this.cell : toPlaceCell;
@@ -52,10 +53,18 @@ export class Bishop extends Figure {
       toPlaceCell.figure &&
       toPlaceCell.figure.color !== this.color;
 
+      if (isForLegality) {
+        return standartMove || takeMove;
+      }
+  
+      const illegalmove = this.cell.board.checkForIllegalMoves(toPlaceCell, this);
+
     if (isForHighlight) {
-      return this.getHighlightVerdict(toPlaceCell, standartMove, takeMove);
+      return this.getHighlightVerdict(toPlaceCell, standartMove, takeMove,illegalmove);
     }
 
-    return [standartMove || takeMove];
+
+
+    return [(standartMove || takeMove) && !illegalmove];
   }
 }

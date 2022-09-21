@@ -26,6 +26,9 @@ export default function Cell(props) {
     lastMoveClass,
     styles.cell,
     styles[props.item.color],
+    props.item?.figure &&
+      props.item?.figure?.isChecked &&
+      styles[`checked${props.item.color}`],
   ]
     .filter((item) => item)
     .join(` `);
