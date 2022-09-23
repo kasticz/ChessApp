@@ -1,0 +1,132 @@
+.optionsPanel{
+    width: 400px;
+    height: auto;
+    border: 1px solid gray;
+    box-shadow: 5px 5px 5px gray;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 32px 0px;
+    border-radius: 16px
+
+}
+
+.gameWithAi{
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    overflow: hidden;
+    transition: 0.5s all;
+}
+
+
+.expandButton,.beginGame{
+    width: 100%;
+    height: 60px;
+    background-color: #424291;
+    outline: none;
+    border: none;
+    padding: 16px;
+    color: white;
+    cursor: pointer;
+    font-size: 24px;
+}
+.expandButton:hover,.beginGame:hover{
+    background-color: #5d5dbb;
+}
+
+.optionsBlock{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-size: 16px;
+    background-color: rgba(219, 214, 217, 0.5);
+    color:black;
+    width: 100%;
+    padding: 16px 8px;
+}
+.optionsTitle,.timeOptions{
+    font-size: 24px;
+    text-align: center;
+}
+.sideOptions{
+    width: 100%;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    font-size: 18px;
+    margin-top: 16px;
+}
+.sideOption{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    outline: none;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    border-radius: 16px;
+    padding: 8px;
+}
+.sideOption img{
+    width: 45px;
+    height: 45px;
+    margin-bottom: 4px;
+}
+.sideOptionPicked,.diffPicked,.timePicked,.sideOption:hover,.sideOption:focus,.sideOption:active,.difficulty:hover,.difficulty:active,.difficulty:focus,.timeStartOption:focus,.timeIncrOption:focus,.timeStartOption:active,.timeIncrOption:active,.timeStartOption:hover,.timeIncrOption:hover{
+    background-color:rgb(179, 172, 176);
+}
+
+.difficulties{
+    display: flex;
+    width: 100%;
+    justify-content: space-around;
+    margin-top: 16px;
+    
+}
+.difficulty{
+    padding: 8px 12px;
+    border: 1px solid black;
+    border-radius: 8px;
+    font-size: 16px;
+    cursor: pointer;
+}
+.timeStart,.timeIncr{
+    outline: none;
+    border: 1px solid gray;
+    box-shadow: 2px 2px 5px gray;
+    border-radius: 16px;
+    padding: 8px 16px;
+    margin-top: 16px;
+    width: 100%;
+}
+.timeOptions{
+    width: 90%;
+}
+.timeStartTitle,.timeIncrTitle{
+    font-size: 20px;
+}
+.timeStartOptions,.timeIncrOptions{
+    width: 100%;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    margin-top: 8px;    
+}
+
+.timeStartOption,.timeIncrOption{
+    padding: 16px;
+    font-size: 32px;
+    border-radius: 16px;
+    outline: none;
+    border: 1px solid gray;
+    width: 80px;
+    cursor: pointer;
+}
+
+.beginGame{
+    margin-top: 16px;
+}
+

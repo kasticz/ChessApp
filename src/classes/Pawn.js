@@ -76,9 +76,12 @@ export class Pawn extends Figure {
 
     if (twoCellsMove && !isForHighlight) this.enPassant = true;
 
+    const promotion = this.color === 'white' && toPlacecell.x === 0  || this.color === 'black' && toPlacecell.x === 7
+
     return [
       (standartMove || twoCellsMove || enPassantMove || takeMove) && !illegalmove,
       enPassantMove,
+      promotion
     ];
   }
 
@@ -86,7 +89,7 @@ export class Pawn extends Figure {
 
 
 
-  makeMove(toPlaceCell, startingCell, enPassant) {
+  makeMove(toPlaceCell, startingCell, enPassant,promotionFigure) {
     startingCell.placeFigure(null);
     enPassant &&
       this.cell.board.cells[toPlaceCell.x - (this.color === "white" ? -1 : 1)][
@@ -94,7 +97,7 @@ export class Pawn extends Figure {
       ].placeFigure(null);
 
     this.cell = toPlaceCell;
-    this.cell.placeFigure(this);
+    this.cell.placeFigure(promotionFigure || this);
 
     if (this.startingPosition) this.startingPosition = false;
   }

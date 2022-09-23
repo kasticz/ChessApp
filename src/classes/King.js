@@ -30,8 +30,6 @@ export class King extends Figure {
 
     const castling = whiteCastling || blackCastling;
 
-
-
     const xDiff = Math.abs(toPlaceCell.x - this.cell.x);
     const yDiff = Math.abs(toPlaceCell.y - this.cell.y);
     if ((xDiff > 1 || yDiff > 1) && !castling) {
@@ -52,6 +50,7 @@ export class King extends Figure {
       ? this.validateCastling(toPlaceCell, isForHighlight, isForLegality)
       : false;
 
+
     if (isForLegality) {
       return standartMove || takeMove || castlingMove.verdict;
     }
@@ -70,11 +69,11 @@ export class King extends Figure {
 
     return [
       (standartMove || takeMove || castlingMove.verdict) && !illegalmove,
-      castlingMove,
+      castlingMove
     ];
   }
 
-  validateCastling(toPlaceCell, isForHighlight, isForLegality) {
+  validateCastling(toPlaceCell) {
     let castlingMove = true;
 
     const board = this.cell.board.cells;
@@ -88,36 +87,45 @@ export class King extends Figure {
 
     const row = toPlaceCell.x === 7 ? 7 : 0;
 
-    if (longCastle) {
-      mainLoop: for (let i = 1; i <= 3; i++) {
-        for (let j = 0; j < opposites.length; j++) {
-          const verdict = opposites[j].figure.validateMove(
-            board[row][i],
-            false,
-            true
-          );
-          if (board[row][i].figure || verdict) {
-            castlingMove = false;
-            break mainLoop;
+    const rookToCastle = shortCastle
+    ? board[row][7].figure
+    : board[row][0].figure;
+
+    if(!rookToCastle.startingPosition) castlingMove = false
+
+    if(castlingMove){
+      if (longCastle) {
+        mainLoop: for (let i = 1; i <= 3; i++) {
+          for (let j = 0; j < opposites.length; j++) {
+            const verdict = opposites[j].figure.validateMove(
+              board[row][i],
+              false,
+              true
+            );
+            if (board[row][i].figure || verdict) {
+              castlingMove = false;
+              break mainLoop;
+            }
           }
         }
-      }
-    } else if (shortCastle) {
-      mainLoop2: for (let i = 5; i <= 6; i++) {
-        for (let j = 0; j < opposites.length; j++) {
-          const verdict = opposites[j].figure.validateMove(
-            board[row][i],
-            false,
-            true
-          );
-          if (board[row][i].figure || verdict) {
-            castlingMove = false;
-            break mainLoop2;
+      } else if (shortCastle) {
+        mainLoop2: for (let i = 5; i <= 6; i++) {
+          for (let j = 0; j < opposites.length; j++) {
+            const verdict = opposites[j].figure.validateMove(
+              board[row][i],
+              false,
+              true
+            );
+            if (board[row][i].figure || verdict) {
+              castlingMove = false;
+              break mainLoop2;
+            }
           }
         }
       }
     }
 
+   
     const standartCastling = !toPlaceCell.figure && castlingMove;
 
     const takeCastling =
@@ -125,9 +133,7 @@ export class King extends Figure {
       toPlaceCell.figure.color === this.color &&
       castlingMove;
 
-    const rookToCastle = shortCastle
-      ? board[row][7].figure
-      : board[row][0].figure;
+
     return {
       standartCastling,
       takeCastling,
@@ -139,8 +145,7 @@ export class King extends Figure {
   }
 
   makeMove(toPlaceCell, startingCell, castling) {
-    if (castling.verdict) {
-      startingCell.placeFigure(null);
+    if (castling?.verdict) {
       const currX = this.color === "white" ? 7 : 0;
 
       const newToPlaceCell = castling.shortCastle
@@ -150,9 +155,17 @@ export class King extends Figure {
         ? this.cell.board.cells[currX][5]
         : this.cell.board.cells[currX][3];
 
+
+
+      startingCell.placeFigure(null);
+      this.cell = newToPlaceCell;
       newToPlaceCell.placeFigure(this);
-      cellForRook.placeFigure(castling.rookToCastle);
+
       castling.rookToCastle.cell.placeFigure(null);
+      castling.rookToCastle.cell = cellForRook;
+      castling.rookToCastle.cell.placeFigure(castling.rookToCastle);
+
+      if (this.startingPosition) this.startingPosition = false;
       return { newToPlaceCell };
     } else {
       startingCell.placeFigure(null);

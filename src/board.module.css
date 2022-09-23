@@ -7,7 +7,7 @@
     justify-content: center;
     flex-wrap: wrap;
     margin: 0 auto;
-    margin-top: 50px;
+    position: relative;
 }
 
 .cell{
@@ -141,4 +141,165 @@
 }
 .app{
     position: relative;
+    display: flex;
+    justify-content: center;
+    padding: 32px;
+    margin-top: 70px;
+}
+
+.notationA::before{
+    content: 'a';
+    position: absolute;
+    bottom: 0;
+    left: 2px;
+    font-size: 16px;
+}
+.notationB::before{
+    content: 'b';
+    position: absolute;
+    bottom: 0;
+    left: 2px;
+    font-size: 16px;
+}
+.notationC::before{
+    content: 'c';
+    position: absolute;
+    bottom: 0;
+    left: 2px;
+    font-size: 16px;
+}
+.notationD::before{
+    content: 'd';
+    position: absolute;
+    bottom: 0;
+    left: 2px;
+    font-size: 16px;
+}
+.notationE::before{
+    content: 'e';
+    position: absolute;
+    bottom: 0;
+    left: 2px;
+    font-size: 16px;
+}
+.notationF::before{
+    content: 'f';
+    position: absolute;
+    bottom: 0;
+    left: 2px;
+    font-size: 16px;
+}
+.notationG::before{
+    content: 'g';
+    position: absolute;
+    bottom: 0;
+    left: 2px;
+    font-size: 16px;
+}
+.notationH::before{
+    content: 'h';
+    position: absolute;
+    bottom: 0;
+    left: 2px;
+    font-size: 16px;
+}
+
+.notation1::after{
+    content: '1';
+    position: absolute;
+    top: 0;
+    right: 2px;
+    font-size: 16px;
+}
+
+.notation2::before{
+    content: '2';
+    position: absolute;
+    top: 0;
+    right: 2px;
+    font-size: 16px;
+}
+
+.notation3::before{
+    content: '3';
+    position: absolute;
+    top: 0;
+    right: 2px;
+    font-size: 16px;
+}
+
+.notation4::before{
+    content: '4';
+    position: absolute;
+    top: 0;
+    right: 2px;
+    font-size: 16px;
+}
+
+.notation5::before{
+    content: '5';
+    position: absolute;
+    top: 0;
+    right: 2px;
+    font-size: 16px;
+}
+
+.notation6::before{
+    content: '6';
+    position: absolute;
+    top: 0;
+    right: 2px;
+    font-size: 16px;
+}
+
+.notation7::before{
+    content: '7';
+    position: absolute;
+    top: 0;
+    right: 2px;
+    font-size: 16px;
+}
+
+.notation8::before{
+    content: '8';
+    position: absolute;
+    top: 0;
+    right: 2px;
+    font-size: 16px;
+}
+
+.blackNotation::before{
+    content: "12345678";
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    z-index: 1000;
+    width: 100%;
+    display: flex;
+    justify-content: space-around;
+    
+}
+/* .whitePromotion{
+    
+    
+ 
+} */
+.whitePromotion,.blackPromotion{
+    position: absolute;
+    left: 50%;
+    top: -90px;
+    transform: translateX(-50%);
+    width: 200px;
+    display: flex;
+    justify-content: center;
+    align-items: center
+
+}
+.whitePromotion img,.blackPromotion img{
+    height: 80px;
+    cursor: pointer;
+    border-radius: 8px;
+}
+.whitePromotion img:hover,.blackPromotion img:hover{
+    background-color: gray;
 }

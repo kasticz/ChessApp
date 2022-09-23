@@ -6,6 +6,19 @@ import { boardActions } from "../store/store";
 export default function Cell(props) {
   const store = useSelector((state) => state.board.toHighlight);
 
+  const letters = "ABCDEFGH";
+  const numbers = "87654321";
+
+  const notationClassLetterWhite = props.item.x === 7 && props.item.board.playerColor === 'white' ? `notation${letters[props.item.y]}` : null;
+  const notationClassNumberWhite = props.item.y === 7 && props.item.board.playerColor === 'white' ?  `notation${numbers[props.item.x]}` : null;
+
+  const notationClassLetterBlack = props.item.x === 0 && props.item.board.playerColor === 'black' ? `notation${letters[props.item.y]}` : null;
+  const notationClassNumberBlack = props.item.y === 0 && props.item.board.playerColor === 'black' ?  `notation${numbers[props.item.x]}` : null;
+
+  const finalNotationLetters = notationClassLetterWhite ? notationClassLetterWhite : notationClassLetterBlack ? notationClassLetterBlack : null
+  const finalNotationNumbers = notationClassNumberWhite ? notationClassNumberWhite : notationClassNumberBlack ? notationClassNumberBlack : null
+
+ 
   const typeOfHighlight = store.find(
     (item) => item.x === props.item.x && item.y === props.item.y
   )?.type;
@@ -51,6 +64,8 @@ export default function Cell(props) {
             alt=""
           />
         )}
+        {finalNotationLetters &&<div className={styles[finalNotationLetters]}></div>}
+        {finalNotationNumbers &&<div className={styles[finalNotationNumbers]}></div>}
       </div>
     </div>
   );

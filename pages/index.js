@@ -12,30 +12,67 @@ import {
 import blackWon from "../src/assets/UI/blackWon.webp";
 import whiteWon from "../src/assets/UI/whiteWon.webp";
 import styles from "../src/board.module.css";
+import OptionsPanel from "../src/components/OptionsPanel";
+import { decideAiMove } from "../src/store/decideAiMove";
+import { allPieces } from "../src/classes/AllPieces";
 
 export default function Home() {
   const [board, setBoard] = useState(null);
   const dispatch = useDispatch();
   const boardRef = useRef();
   const [gameEnd, setGameEnd] = useState(false);
+  const [promotion, setPromotion] = useState();
+  const gameState = useSelector((state) => state.board.gameState);
+  const gameId = useSelector((state) => state.board.gameId);
+
+  
 
   let startingCell = null;
 
   useEffect(() => {
     if (!board) {
       const playingBoard = new Board();
-      playingBoard.fillBoard();
+      playingBoard.fillBoard("white");
       playingBoard.createFigures();
       setBoard(playingBoard);
     } else {
+      async function makeMove() {
+        const xCoords = "87654321";
+        const yCoords = "abcdefgh";
+        const lastMoveStart = `${yCoords[board.lastMoveStart.y]}${
+          xCoords[board.lastMoveStart.x]
+        }`;
+        const lastMoveEnd = `${yCoords[board.lastMoveEnd.y]}${
+          xCoords[board.lastMoveEnd.x]
+        }`;
+
+        const resp = await fetch("./api/makeMove", {
+          method: "POST",
+          body: JSON.stringify({
+            gameId: gameId,
+            move: `${lastMoveStart}${lastMoveEnd}`,
+          }),
+          headers: {
+            "Content-type": "application/json",
+          },
+        });
+      }
+      if(board?.lastMoveStart) makeMove()
       if (board.gameEnd) {
         setGameEnd(board.gameEnd);
       }
     }
   }, [board]);
 
+
+  useEffect(() => {
+    decideAiMove(gameState,board,setBoard,Board)
+  }, [gameState]);
+
+
+
   function onClickHandler(e, figure, cell) {
-    // if (!figure.playerFigure) return;
+    if (!figure.playerFigure) return;
 
     if (
       startingCell &&
@@ -87,7 +124,8 @@ export default function Home() {
         setBoard,
         dispatch,
         boardRef,
-        startingCell
+        startingCell,
+        setPromotion
       );
       ghostPiece.elem.remove();
       currPiece.removeEventListener(`mouseup`, onMouseUpHandler);
@@ -95,14 +133,73 @@ export default function Home() {
     }
   }
 
+  function promote(piece) {
+    const newFigure = new allPieces[piece](
+      board.playerColor,
+      board.cells[promotion.toPlaceCell.x][promotion.toPlaceCell.y],
+      true,
+      true
+    );
+    promotion.figure.makeMove(promotion.toPlaceCell,promotion.startCell,false,newFigure)
+
+    setBoard((prevState) => {
+      const newBoard = new Board(
+        prevState.cells,
+        promotion.startCell,
+        promotion.toPlaceCell,
+        promotion.figure.rank,
+        prevState.playerColor
+      );
+      newBoard.reapplyBoard();
+      newBoard.checkForChecks();
+      return newBoard;
+    });
+    setPromotion(null)
+  }
+
+
   return (
     <div className={styles.app}>
+      <OptionsPanel Board={Board} setBoard={setBoard} />
       <div ref={boardRef} className={styles.board}>
+        {promotion && board && (
+          <div className={styles[`${board?.playerColor || "white"}Promotion`]}>
+            <img
+              onClick={() => {
+                promote("queen");
+              }}
+              src={piecesImgs[`${board.playerColor}_queen`]}
+              alt=""
+            />
+            <img
+              onClick={() => {
+                promote("knight");
+              }}
+              src={piecesImgs[`${board.playerColor}_knight`]}
+              alt=""
+            />
+            <img
+              onClick={() => {
+                promote("rook");
+              }}
+              src={piecesImgs[`${board.playerColor}_rook`]}
+              alt=""
+            />
+            <img
+              onClick={() => {
+                promote("bishop");
+              }}
+              src={piecesImgs[`${board.playerColor}_bishop`]}
+              alt=""
+            />
+          </div>
+        )}
+
         <BoardComp fn={onClickHandler} board={board} />
       </div>
       {gameEnd && (
         <div className={styles.gameEnd}>
-          Игра Окончена! <hr /> Выиграли {gameEnd.winner}{" "}
+          Игра Окончена! <hr /> Выиграли {gameEnd.winner}
           <img
             src={gameEnd.winner === "чёрные" ? blackWon.src : whiteWon.src}
             alt=""
