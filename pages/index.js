@@ -1,7 +1,7 @@
 import { useDispatch, useSelector } from "react-redux";
 import Board from "../src/classes/Board";
 import BoardComp from "../src/components/BoardComp";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, Fragment } from "react";
 import { piecesImgs } from "../src/PiecesImgs";
 import { boardActions } from "../src/store/store";
 import {
@@ -11,10 +11,12 @@ import {
 } from "../src/store/interfaceLogic";
 import blackWon from "../src/assets/UI/blackWon.webp";
 import whiteWon from "../src/assets/UI/whiteWon.webp";
+import draw from "../src/assets/UI/draw.jpg";
 import styles from "../src/board.module.css";
 import OptionsPanel from "../src/components/OptionsPanel";
 import { decideAiMove } from "../src/store/decideAiMove";
 import { allPieces } from "../src/classes/AllPieces";
+import Clock from "../src/components/Clock";
 
 export default function Home() {
   const [board, setBoard] = useState(null);
@@ -24,8 +26,7 @@ export default function Home() {
   const [promotion, setPromotion] = useState();
   const gameState = useSelector((state) => state.board.gameState);
   const gameId = useSelector((state) => state.board.gameId);
-
-  
+  const gameEndRef = useRef();
 
   let startingCell = null;
 
@@ -46,11 +47,19 @@ export default function Home() {
           xCoords[board.lastMoveEnd.x]
         }`;
 
+        const promotionFigure = board.promotionFigure
+          ? board.promotionFigure === "knight"
+            ? "n"
+            : board.promotionFigure[0]
+          : "";
+
+        // console.log(`${lastMoveStart}${lastMoveEnd}${promotionFigure}`);
+
         const resp = await fetch("./api/makeMove", {
           method: "POST",
           body: JSON.stringify({
             gameId: gameId,
-            move: `${lastMoveStart}${lastMoveEnd}`,
+            move: `${lastMoveStart}${lastMoveEnd}${promotionFigure}`,
           }),
           headers: {
             "Content-type": "application/json",
@@ -64,15 +73,39 @@ export default function Home() {
     }
   }, [board]);
 
-
   useEffect(() => {
-    decideAiMove(gameState,board,setBoard,Board)
+    if(gameState){
+      decideAiMove(gameState, board, setBoard, Board);
+    }
+   
   }, [gameState]);
 
+  useEffect(() => {
+    if(board?.whoToMove && gameEnd){
+      setBoard((prevState) => {
+        const newBoard = new Board(
+          prevState.cells,
+          null,
+          null,
+          null,
+          prevState.playerColor,
+          null,
+          null
+        );
+        newBoard.reapplyBoard();
+        newBoard.checkForChecks();
+        return newBoard;
+      });
 
+    }
+    if (gameEnd) {
+      gameEndRef.current.focus();
+    }
+  }, [gameEnd]);
+  // console.log(gameState)
 
   function onClickHandler(e, figure, cell) {
-    if (!figure.playerFigure) return;
+    if (!figure.playerFigure || board.whoToMove !== board.playerColor || !gameId) return;
 
     if (
       startingCell &&
@@ -137,10 +170,15 @@ export default function Home() {
     const newFigure = new allPieces[piece](
       board.playerColor,
       board.cells[promotion.toPlaceCell.x][promotion.toPlaceCell.y],
-      true,
+      board.playerColor === promotion.figure.color,
       true
     );
-    promotion.figure.makeMove(promotion.toPlaceCell,promotion.startCell,false,newFigure)
+    promotion.figure.makeMove(
+      promotion.toPlaceCell,
+      promotion.startCell,
+      false,
+      newFigure
+    );
 
     setBoard((prevState) => {
       const newBoard = new Board(
@@ -148,15 +186,18 @@ export default function Home() {
         promotion.startCell,
         promotion.toPlaceCell,
         promotion.figure.rank,
-        prevState.playerColor
+        prevState.playerColor,
+        prevState.playerColor === "white" ? "black" : "white",
+        newFigure.rank || null
       );
       newBoard.reapplyBoard();
       newBoard.checkForChecks();
       return newBoard;
     });
-    setPromotion(null)
+    setPromotion(null);
   }
 
+  // console.log(board)
 
   return (
     <div className={styles.app}>
@@ -196,16 +237,39 @@ export default function Home() {
         )}
 
         <BoardComp fn={onClickHandler} board={board} />
+        {gameState && board && (
+          <Fragment>
+            <Clock board={board} whoToMove={board.whoToMove} playerColor={board.playerColor} side={'opposite'}/>
+            <Clock board={board} whoToMove={board.whoToMove} playerColor={board.playerColor} side={'player'} />
+          </Fragment>
+        )}
+
+        {gameEnd && (
+          <div
+            ref={gameEndRef}
+            tabIndex={5}
+            onBlur={() => {
+              setGameEnd(false);
+            }}
+            className={styles.gameEnd}
+          >
+            Игра Окончена! <hr />{" "}
+            {gameEnd.winner !== "Пат"
+              ? `Выиграли ${gameEnd.winner}`
+              : `${gameEnd.winner}`}
+            <img
+              src={
+                gameEnd.winner === "чёрные"
+                  ? blackWon.src
+                  : gameEnd.winner === "белые"
+                  ? whiteWon.src
+                  : draw.src
+              }
+              alt=""
+            />
+          </div>
+        )}
       </div>
-      {gameEnd && (
-        <div className={styles.gameEnd}>
-          Игра Окончена! <hr /> Выиграли {gameEnd.winner}
-          <img
-            src={gameEnd.winner === "чёрные" ? blackWon.src : whiteWon.src}
-            alt=""
-          />
-        </div>
-      )}
     </div>
   );
 }

@@ -1,21 +1,37 @@
+import { allPieces } from "../classes/AllPieces";
+
 export function decideAiMove(gameState, board, setBoard, Board) {
-  if (board?.lastMoveStart || board?.playerColor === 'black') {
+  if (board?.lastMoveStart || board?.playerColor === "black") {
     const xCoords = "87654321";
     const yCoords = "abcdefgh";
-    const lastMoveStart = board.lastMoveStart ? `${yCoords[board.lastMoveStart.y]}${
-      xCoords[board.lastMoveStart.x]
-    }` : "";
-    const lastMoveEnd = board.lastMoveStart ? `${yCoords[board.lastMoveEnd.y]}${
-      xCoords[board.lastMoveEnd.x]
-    }` : "";
-    const lastMove = `${lastMoveStart}${lastMoveEnd}`;
+    const lastMoveStart = board.lastMoveStart
+      ? `${yCoords[board.lastMoveStart.y]}${xCoords[board.lastMoveStart.x]}`
+      : "";
+    const lastMoveEnd = board.lastMoveStart
+      ? `${yCoords[board.lastMoveEnd.y]}${xCoords[board.lastMoveEnd.x]}`
+      : "";
 
-    const gameLastMove = gameState.lastMove || gameState.state.moves
+      const prFigure =  board.promotionFigure ? board.promotionFigure === 'knight' ? 'n' : board.promotionFigure[0] : ''
+    const lastMove = `${lastMoveStart}${lastMoveEnd}${prFigure}`;
 
+    const gameLastMove = gameState.lastMove || gameState.state.moves;
+
+    
 
     if (gameLastMove && gameLastMove !== lastMove) {
       const startingCell = gameLastMove.slice(0, 2);
       const endCell = gameLastMove.slice(2);
+
+      const promotionCheck = gameLastMove[4] ? gameLastMove[4] : null;
+      const promotionFigures = {
+        q: "queen",
+        r: "rook",
+        n: "knight",
+        b: "bishop",
+      };
+      const promotionFigure = promotionCheck
+        ? promotionFigures[promotionCheck]
+        : null;
 
       const startingCellInBoard =
         board.cells[Math.abs(+startingCell[1] - 8)][
@@ -26,27 +42,34 @@ export function decideAiMove(gameState, board, setBoard, Board) {
       const figureRank = startingCellInBoard.figure.rank;
 
       let specialMoveCheck =
-        figureRank === "king"
-          ? startingCellInBoard.figure.validateMove(endCellInBoard)
-          : figureRank === "pawn"
+        figureRank === "king" || figureRank === 'pawn' 
           ? startingCellInBoard.figure.validateMove(endCellInBoard)
           : null;
 
-
-
-      const castlingCheck = startingCellInBoard.figure.makeMove(
+      const specialMove = startingCellInBoard.figure.makeMove(
         endCellInBoard,
         startingCellInBoard,
-        specialMoveCheck &&  specialMoveCheck[1] ? specialMoveCheck[1] : undefined
+        specialMoveCheck && specialMoveCheck[1]
+          ? specialMoveCheck[1]
+          : null,
+        promotionFigure && specialMoveCheck[2]
+          ? new allPieces[promotionFigure](
+              startingCellInBoard.figure.color,
+              endCellInBoard,
+              board.playerColor === startingCellInBoard.figure.color,
+              true
+            )
+          : null
       );
 
       setBoard((prevState) => {
         const newBoard = new Board(
           prevState.cells,
           startingCellInBoard,
-          castlingCheck?.newToPlaceCell || endCellInBoard ,
+          specialMove?.newToPlaceCell || endCellInBoard,
           figureRank,
-          prevState.playerColor
+          prevState.playerColor,
+          prevState.playerColor === "white" ? "white" : "black"
         );
         newBoard.reapplyBoard();
         newBoard.checkForChecks();

@@ -52,7 +52,7 @@ export default function OptionsPanel(props) {
         {
           method: "GET",
           headers: {
-            Authorization: "Bearer lip_JyEGyWaJKfDllwuKcOf7",
+            Authorization: "Bearer lip_iv6D0kHd9JYpjZFICZXJ",
           },
         }
       );
@@ -83,7 +83,11 @@ export default function OptionsPanel(props) {
         return loop();
       };
       const onMessage = (obj) => dispatch(boardActions.setGameState(obj));
-      const onComplete = () => dispatch(boardActions.setGameId(null));
+      const onComplete = () =>{
+        dispatch(boardActions.setGameState(null))
+        dispatch(boardActions.setGameId(null))
+
+      } ;
   
       response.then(readStream(onMessage)).then(onComplete);
     }

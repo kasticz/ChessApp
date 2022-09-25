@@ -137,7 +137,7 @@
 }
 .gameEnd img{
     margin-top: 32px;
-    max-width: 300px;
+    max-width: 95%
 }
 .app{
     position: relative;
@@ -279,11 +279,7 @@
     justify-content: space-around;
     
 }
-/* .whitePromotion{
-    
-    
- 
-} */
+
 .whitePromotion,.blackPromotion{
     position: absolute;
     left: 50%;

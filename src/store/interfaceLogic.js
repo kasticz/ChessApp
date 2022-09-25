@@ -104,7 +104,8 @@ export function endMoveHandler(
         cell,
         castlingCheck?.newToPlaceCell || cellInBoard,
         figure.rank,
-        prevState.playerColor
+        prevState.playerColor,
+        prevState.playerColor === 'white' ? 'black' : 'white'
       );
       newBoard.reapplyBoard();
       newBoard.checkForChecks();
@@ -187,7 +188,8 @@ function endMoveWithoutDragging(
         startingCell,
         castlingCheck?.newToPlaceCell || toPlaceCell,
         figure.rank,
-        prevState.playerColor
+        prevState.playerColor,
+        prevState.playerColor === 'white' ? 'black' : 'white'
       );
       newBoard.reapplyBoard();
       newBoard.checkForChecks();

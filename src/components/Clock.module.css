@@ -1,0 +1,20 @@
+
+.player,.opposite{
+    position: absolute;
+    right: -250px;
+    font-size: 32px;
+    background-color: rgba(219, 214, 217, 0.5);
+    padding: 32px;
+    border-radius: 8px;
+}
+.opposite {
+    top:15%
+}
+
+.player{
+    bottom:15%
+}
+
+.timerActive{
+    background-color: rgba(161, 212, 101, 0.5);
+}

@@ -9,17 +9,20 @@ import { King } from "./King";
 import { allPieces } from "./AllPieces";
 
 export default class Board {
-  constructor(cells, lastMoveStart, lastMoveEnd, figureRank,playerColor) {
+  constructor(cells, lastMoveStart, lastMoveEnd, figureRank,playerColor,whoToMove,promotionFigure) {
     this.cells = cells;
     this.lastMoveStart = lastMoveStart;
     this.lastMoveEnd = lastMoveEnd;
     this.figureRank = figureRank;
-    this.playerColor = playerColor || null
+    this.playerColor = playerColor || null,
+    this.whoToMove = whoToMove
+    this.promotionFigure = promotionFigure
   }
 
   fillBoard(playerColor) {
     this.cells = [];
     this.playerColor = playerColor
+    this.whoToMove = playerColor === 'white' ? 'white' : 'black'
 
     if (this.playerColor === "white") {
       for (let i = 0; i < 8; i++) {
@@ -137,7 +140,7 @@ export default class Board {
     const newFigure = new allPieces[figure.rank](
       figure.color,
       this.cells[figure.cell.x][figure.cell.y],
-      true,
+      figure.cell.board.playerColor === figure.color,
       figure.startingPosition,
       figure.isChecked
     );
@@ -196,20 +199,20 @@ export default class Board {
         }
         kings[i].figure.isChecked = false;
       }
-      let hasAnyMove = kings[i].figure.isChecked ? false : true;
+      let hasAnyMove = false
       if (!hasAnyMove) {
         const allCells = this.cells.flat(1);
         const allAlliedFigures = allCells.filter(
-          (item) => item.figure && item.figure.color === kings[i].color
+          (item) => item.figure && item.figure.color === kings[i].figure.color
         );
+        
 
         subLoop2: for (let n = 0; n < allCells.length; n++) {
           for (let k = 0; k < allAlliedFigures.length; k++) {
             const verdict = allAlliedFigures[k].figure.validateMove(
               allCells[n]
             );
-            if (verdict[0]) {
-              console.log(verdict, allCells[k]);
+            if (verdict[0]) {             
               hasAnyMove = true;
               break subLoop2;
             }
@@ -217,10 +220,18 @@ export default class Board {
         }
 
         if (!hasAnyMove) {
-          this.gameEnd = {
-            winner: kings[i].color === "white" ? "чёрные" : "белые",
-          };
-          break;
+          if(kings[i].figure.isChecked){
+            this.gameEnd = {
+              winner: kings[i].figure.color === "white" ? "чёрные" : "белые",
+            };
+            break;
+          }else{
+            this.gameEnd = {
+              winner: 'Пат'
+            };
+
+          }
+
         }
       }
     }

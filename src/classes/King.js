@@ -39,7 +39,7 @@ export class King extends Figure {
     const possibleMove =
       (xDiff === 1 && yDiff < 2) || (yDiff === 1 && xDiff < 2 && !castling);
 
-    const standartMove = possibleMove && !toPlaceCell.Figure;
+    const standartMove = possibleMove && !toPlaceCell.figure;
 
     const takeMove =
       possibleMove &&
@@ -50,6 +50,8 @@ export class King extends Figure {
       ? this.validateCastling(toPlaceCell, isForHighlight, isForLegality)
       : false;
 
+      
+
 
     if (isForLegality) {
       return standartMove || takeMove || castlingMove.verdict;
@@ -57,6 +59,8 @@ export class King extends Figure {
     const illegalmove = castlingMove
       ? false
       : this.cell.board.checkForIllegalMoves(toPlaceCell, this);
+
+
 
     if (isForHighlight) {
       return this.getHighlightVerdict(
@@ -91,7 +95,7 @@ export class King extends Figure {
     ? board[row][7].figure
     : board[row][0].figure;
 
-    if(!rookToCastle.startingPosition) castlingMove = false
+    if(rookToCastle && !rookToCastle.startingPosition) castlingMove = false
 
     if(castlingMove){
       if (longCastle) {

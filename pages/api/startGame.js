@@ -15,7 +15,7 @@ export default async function handler(req, res) {
         fen: 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1'
     }),
     headers: {
-      Authorization: "Bearer lip_JyEGyWaJKfDllwuKcOf7",
+      Authorization: "Bearer lip_iv6D0kHd9JYpjZFICZXJ",
       'Content-type': 'application/json'
     },
   });
