@@ -1,4 +1,8 @@
-
+.app{
+    position: relative;
+    display: flex;
+    margin-top: 70px;
+}
 
 .board{
     width: 800px;
@@ -6,7 +10,8 @@
     display: flex;
     justify-content: center;
     flex-wrap: wrap;
-    margin: 0 auto;
+    margin-left: 100px;
+    margin-right: 100px;
     position: relative;
 }
 
@@ -139,13 +144,7 @@
     margin-top: 32px;
     max-width: 95%
 }
-.app{
-    position: relative;
-    display: flex;
-    justify-content: center;
-    padding: 32px;
-    margin-top: 70px;
-}
+
 
 .notationA::before{
     content: 'a';
@@ -298,4 +297,10 @@
 }
 .whitePromotion img:hover,.blackPromotion img:hover{
     background-color: gray;
+}
+
+.uiWrapper{
+    width: 400px;
+    position: relative;
+
 }

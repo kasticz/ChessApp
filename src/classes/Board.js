@@ -9,7 +9,7 @@ import { King } from "./King";
 import { allPieces } from "./AllPieces";
 
 export default class Board {
-  constructor(cells, lastMoveStart, lastMoveEnd, figureRank,playerColor,whoToMove,promotionFigure) {
+  constructor(cells, lastMoveStart, lastMoveEnd, figureRank,playerColor,whoToMove,promotionFigure,historyMoves) {
     this.cells = cells;
     this.lastMoveStart = lastMoveStart;
     this.lastMoveEnd = lastMoveEnd;
@@ -17,12 +17,14 @@ export default class Board {
     this.playerColor = playerColor || null,
     this.whoToMove = whoToMove
     this.promotionFigure = promotionFigure
+    this.historyMoves = historyMoves
   }
 
   fillBoard(playerColor) {
     this.cells = [];
     this.playerColor = playerColor
     this.whoToMove = playerColor === 'white' ? 'white' : 'black'
+    this.historyMoves = []
 
     if (this.playerColor === "white") {
       for (let i = 0; i < 8; i++) {
@@ -176,7 +178,10 @@ export default class Board {
     return illegalMove;
   }
 
-  checkForChecks() {
+  checkForChecks(isResign) {
+    if(isResign){
+      this.gameEnd = {winner:this.playerColor === "white" ? "чёрные" : "белые" }
+    }
     const kings = this.cells
       .flat(1)
       .filter((item) => item.figure && item.figure.rank === "king");

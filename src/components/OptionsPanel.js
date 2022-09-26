@@ -31,7 +31,7 @@ export default function OptionsPanel(props) {
         color: side ? side : "random",
       }),
       headers: {
-        "Content-type": "applications/json",
+        "Content-type": "application/json",
       },
     });
     const data = await resp.json();
@@ -96,6 +96,10 @@ export default function OptionsPanel(props) {
     
 
   },[gameId])
+
+  useEffect(()=>{
+    dispatch(boardActions.setGameTime(timeStart))
+  },[timeStart])
 
   return (
     <div className={styles.optionsPanel}>
@@ -316,7 +320,6 @@ export default function OptionsPanel(props) {
           </div>
         </Fragment>
         <button onClick={startGame} className={styles.beginGame}>
-          {" "}
           Начать игру
         </button>
       </div>

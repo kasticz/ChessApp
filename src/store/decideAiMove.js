@@ -40,6 +40,7 @@ export function decideAiMove(gameState, board, setBoard, Board) {
       const endCellInBoard =
         board.cells[Math.abs(+endCell[1] - 8)][+yCoords.indexOf(endCell[0])];
       const figureRank = startingCellInBoard.figure.rank;
+      const f = startingCellInBoard.figure
 
       let specialMoveCheck =
         figureRank === "king" || figureRank === 'pawn' 
@@ -63,13 +64,23 @@ export function decideAiMove(gameState, board, setBoard, Board) {
       );
 
       setBoard((prevState) => {
+        console.log(prevState)
         const newBoard = new Board(
           prevState.cells,
           startingCellInBoard,
           specialMove?.newToPlaceCell || endCellInBoard,
           figureRank,
           prevState.playerColor,
-          prevState.playerColor === "white" ? "white" : "black"
+          prevState.playerColor === "white" ? "white" : "black",
+          promotionFigure || null,
+          [
+            ...prevState.historyMoves || [],
+            {
+              figure: {rank: f.rank, color: f.color},
+              toPlaceCell: endCellInBoard ,
+              startCell: startingCellInBoard,
+            },
+          ]
         );
         newBoard.reapplyBoard();
         newBoard.checkForChecks();

@@ -105,7 +105,16 @@ export function endMoveHandler(
         castlingCheck?.newToPlaceCell || cellInBoard,
         figure.rank,
         prevState.playerColor,
-        prevState.playerColor === 'white' ? 'black' : 'white'
+        prevState.playerColor === 'white' ? 'black' : 'white',
+        prevState.promotionFigure || null,
+        [
+          ...prevState.historyMoves,
+          {
+            figure: {rank: figure.rank, color: figure.color},
+            toPlaceCell:cellInBoard ,
+            startCell: cell ,
+          },
+        ]
       );
       newBoard.reapplyBoard();
       newBoard.checkForChecks();
@@ -189,7 +198,16 @@ function endMoveWithoutDragging(
         castlingCheck?.newToPlaceCell || toPlaceCell,
         figure.rank,
         prevState.playerColor,
-        prevState.playerColor === 'white' ? 'black' : 'white'
+        prevState.playerColor === 'white' ? 'black' : 'white',
+        prevState.promotionFigure || null,
+        [
+          ...prevState.historyMoves,
+          {
+            figure: {rank: figure.rank, color: figure.color},
+            toPlaceCell: toPlaceCell ,
+            startCell: startingCell,
+          },
+        ]
       );
       newBoard.reapplyBoard();
       newBoard.checkForChecks();

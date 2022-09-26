@@ -34,6 +34,9 @@ const board = createSlice({
         },
         setGameId(state,payload){
             state.gameId = payload.payload
+        },
+        setGameTime(state,payload){
+            state.gameTime = payload.payload * 60
         }
     }
 

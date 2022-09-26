@@ -1,0 +1,66 @@
+.historyWrapper{
+    width: 400px;
+    height: 400px;
+    display: flex; 
+    align-items: flex-start;
+    flex-direction: column;
+    background-color: rgba(219, 214, 217, 0.5);
+    margin: 100px 0 50px 0;
+    position: relative;
+    overflow:auto;
+}
+
+
+.notationLine{
+    width: 100%;
+    font-size: 20px;
+    display: flex;
+    align-items: center;
+    padding: 16px;
+    border-radius: 16px;
+    justify-content: space-between;
+}
+
+.moveNotation{
+    width: 120px;       
+    display: flex;
+    align-items: center;
+    border-radius: 16px;
+    padding: 8px;
+    min-height: px;
+    text-align-last: left;
+}
+.moveNotation img{
+    max-height: 50px;
+}
+.moveNumber{
+    font-weight: 700;
+    margin-right: 8px;
+    font-size: 26px;
+}
+.moveNotation:nth-child(2n){
+    margin-right: 16px;
+}
+.resign{
+    position: absolute;
+    top: 130px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 250px;
+    padding: 16px;
+    background-color: #424291;
+    color: white;
+    font-size: 25px;
+    border-radius: 8px;
+    outline: none;
+    border: none;
+    cursor: pointer
+}
+.resign:hover,.resign:active{
+    background-color: #5d5dbb;
+}
+
+.disabled,.disabled:hover,.disabled:active{
+    background-color: #adadd3 ;
+    cursor: not-allowed;
+}

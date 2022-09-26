@@ -17,6 +17,7 @@ import OptionsPanel from "../src/components/OptionsPanel";
 import { decideAiMove } from "../src/store/decideAiMove";
 import { allPieces } from "../src/classes/AllPieces";
 import Clock from "../src/components/Clock";
+import HistoryMoves from '../src/components/HistoryMoves.js'
 
 export default function Home() {
   const [board, setBoard] = useState(null);
@@ -53,7 +54,7 @@ export default function Home() {
             : board.promotionFigure[0]
           : "";
 
-        // console.log(`${lastMoveStart}${lastMoveEnd}${promotionFigure}`);
+        console.log(`${lastMoveStart}${lastMoveEnd}${promotionFigure}`);
 
         const resp = await fetch("./api/makeMove", {
           method: "POST",
@@ -77,11 +78,10 @@ export default function Home() {
     if(gameState){
       decideAiMove(gameState, board, setBoard, Board);
     }
-   
   }, [gameState]);
 
   useEffect(() => {
-    if(board?.whoToMove && gameEnd){
+    if (board?.whoToMove && gameEnd) {
       setBoard((prevState) => {
         const newBoard = new Board(
           prevState.cells,
@@ -90,13 +90,13 @@ export default function Home() {
           null,
           prevState.playerColor,
           null,
-          null
+          null,
+          prevState.historyMoves
         );
         newBoard.reapplyBoard();
         newBoard.checkForChecks();
         return newBoard;
       });
-
     }
     if (gameEnd) {
       gameEndRef.current.focus();
@@ -105,7 +105,7 @@ export default function Home() {
   // console.log(gameState)
 
   function onClickHandler(e, figure, cell) {
-    if (!figure.playerFigure || board.whoToMove !== board.playerColor || !gameId) return;
+    // if (!figure.playerFigure || board.whoToMove !== board.playerColor || !gameId) return;
 
     if (
       startingCell &&
@@ -188,7 +188,16 @@ export default function Home() {
         promotion.figure.rank,
         prevState.playerColor,
         prevState.playerColor === "white" ? "black" : "white",
-        newFigure.rank || null
+        newFigure.rank || null,
+        [
+          ...prevState.historyMoves,
+          {
+            figure: {rank: promotion.figure.rank, color: promotion.figure.color},
+            toPlaceCell: promotion.toPlaceCell,
+            startCell: promotion.startCell,
+            promotionFigure: newFigure
+          },
+        ]
       );
       newBoard.reapplyBoard();
       newBoard.checkForChecks();
@@ -197,7 +206,7 @@ export default function Home() {
     setPromotion(null);
   }
 
-  // console.log(board)
+  console.log(board)
 
   return (
     <div className={styles.app}>
@@ -237,12 +246,8 @@ export default function Home() {
         )}
 
         <BoardComp fn={onClickHandler} board={board} />
-        {gameState && board && (
-          <Fragment>
-            <Clock board={board} whoToMove={board.whoToMove} playerColor={board.playerColor} side={'opposite'}/>
-            <Clock board={board} whoToMove={board.whoToMove} playerColor={board.playerColor} side={'player'} />
-          </Fragment>
-        )}
+
+
 
         {gameEnd && (
           <div
@@ -270,6 +275,21 @@ export default function Home() {
           </div>
         )}
       </div>
+      <div className={styles.uiWrapper}>
+          <Clock
+            board={board}
+            whoToMove={board?.whoToMove}
+            playerColor={board?.playerColor}
+            side={"opposite"}
+          />           
+          <HistoryMoves setBoard={setBoard}  history={board?.historyMoves || null}/>
+          <Clock
+            board={board}
+            whoToMove={board?.whoToMove}
+            playerColor={board?.playerColor}
+            side={"player"}
+          />
+        </div>
     </div>
   );
 }
