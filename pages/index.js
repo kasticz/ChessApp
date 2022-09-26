@@ -105,7 +105,7 @@ export default function Home() {
   // console.log(gameState)
 
   function onClickHandler(e, figure, cell) {
-    // if (!figure.playerFigure || board.whoToMove !== board.playerColor || !gameId) return;
+    if (!figure.playerFigure || board.whoToMove !== board.playerColor || !gameId) return;
 
     if (
       startingCell &&
