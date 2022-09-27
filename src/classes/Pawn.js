@@ -78,6 +78,7 @@ export class Pawn extends Figure {
 
     const promotion = this.color === 'white' && toPlacecell.x === 0  || this.color === 'black' && toPlacecell.x === 7
 
+
     return [
       (standartMove || twoCellsMove || enPassantMove || takeMove) && !illegalmove,
       enPassantMove,
@@ -90,6 +91,11 @@ export class Pawn extends Figure {
 
 
   makeMove(toPlaceCell, startingCell, enPassant,promotionFigure) {
+    if(toPlaceCell.figure || enPassant || promotionFigure){
+      this.cell.board.audio = 'take'
+    }else{
+      this.cell.board.audio = 'standard'
+    }
     startingCell.placeFigure(null);
     enPassant &&
       this.cell.board.cells[toPlaceCell.x - (this.color === "white" ? -1 : 1)][

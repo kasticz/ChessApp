@@ -7,19 +7,25 @@ import blackKing from "../assets/pieces/black_king.svg";
 import styles from "./OptionsPanel.module.css";
 
 export default function OptionsPanel(props) {
-  const [aiExpanded, setAiExpanded] = useState(false);
+  // const [aiExpanded, setAiExpanded] = useState(false);
   const [side, setSide] = useState(null);
   const [diff, seDiff] = useState(null);
   const [timeStart, setTimeStart] = useState(null);
   const [timeIncr, setTimeIncr] = useState(null);
 
+  const gameState = useSelector(state=>state.board.gameState)
   const gameId = useSelector((state) => state.board.gameId);
 
   const dispatch = useDispatch();
 
+  
+
 
 
   async function startGame() {
+    props.setSpinner(true)
+    const isRandom = side === 'random' ? Math.random() * 2 : null
+    const randomColor = isRandom ? isRandom < 1 ? 'black' : isRandom >= 1 ? 'white' : null : null
     const resp = await fetch("./api/startGame", {
       method: "POST",
       body: JSON.stringify({
@@ -28,7 +34,7 @@ export default function OptionsPanel(props) {
           limit: timeStart ? timeStart * 60 : 300,
           increment: timeIncr !== null ? timeIncr : 3,
         },
-        color: side ? side : "random",
+        color: randomColor ? randomColor : side ? side : 'white',
       }),
       headers: {
         "Content-type": "application/json",
@@ -40,9 +46,10 @@ export default function OptionsPanel(props) {
 
  
     const playingBoard = new props.Board();
-    playingBoard.fillBoard(side || "white");
+    playingBoard.fillBoard(randomColor ? randomColor : side ? side : 'white');
     playingBoard.createFigures();
     props.setBoard(playingBoard);
+    props.setSpinner(false)
   }
 
   useEffect(()=>{
@@ -91,10 +98,7 @@ export default function OptionsPanel(props) {
   
       response.then(readStream(onMessage)).then(onComplete);
     }
-    if(gameId) startGameStream()
-
-    
-
+    if(gameId) startGameStream()  
   },[gameId])
 
   useEffect(()=>{
@@ -103,18 +107,7 @@ export default function OptionsPanel(props) {
 
   return (
     <div className={styles.optionsPanel}>
-      <div
-        style={{ height: `${aiExpanded ? 760 : 60}px` }}
-        className={styles.gameWithAi}
-      >
-        <button
-          onClick={() => {
-            setAiExpanded(!aiExpanded);
-          }}
-          className={styles.expandButton}
-        >
-          Игра с компьютером
-        </button>
+
         <Fragment>
           <div className={styles.optionsBlock}>
             <div className={styles.optionsTitle}>Я хочу играть </div>
@@ -319,10 +312,10 @@ export default function OptionsPanel(props) {
             </div>
           </div>
         </Fragment>
-        <button onClick={startGame} className={styles.beginGame}>
+        <button disabled={gameState} onClick={startGame} className={`${styles.beginGame} ${gameState ? styles.disabled : ''}`}>
           Начать игру
         </button>
-      </div>
+      
     </div>
   );
 }

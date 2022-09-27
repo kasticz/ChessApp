@@ -9,7 +9,7 @@
     padding: 32px 0px;
     border-radius: 16px;
     margin-left: 50px;
-
+    height: 800px;
 }
 
 .gameWithAi{
@@ -131,3 +131,7 @@
     margin-top: 16px;
 }
 
+.disabled,.disabled:hover,.disabled:active{
+    background-color: #adadd3 ;
+    cursor: not-allowed;
+}

@@ -9,7 +9,7 @@ import { King } from "./King";
 import { allPieces } from "./AllPieces";
 
 export default class Board {
-  constructor(cells, lastMoveStart, lastMoveEnd, figureRank,playerColor,whoToMove,promotionFigure,historyMoves) {
+  constructor(cells, lastMoveStart, lastMoveEnd, figureRank,playerColor,whoToMove,promotionFigure,historyMoves,prevBoard) {
     this.cells = cells;
     this.lastMoveStart = lastMoveStart;
     this.lastMoveEnd = lastMoveEnd;
@@ -17,7 +17,8 @@ export default class Board {
     this.playerColor = playerColor || null,
     this.whoToMove = whoToMove
     this.promotionFigure = promotionFigure
-    this.historyMoves = historyMoves
+    this.historyMoves = historyMoves,
+    this.audio = prevBoard?.audio || null
   }
 
   fillBoard(playerColor) {

@@ -1,5 +1,5 @@
 export default async function handler(req, res) {
-  const body = JSON.parse(req.body);
+  const body = req.body
 
 
 
@@ -20,7 +20,7 @@ export default async function handler(req, res) {
     },
   });
 
-  console.log(body.color)
+
 
   const respData = await resp.json();
 

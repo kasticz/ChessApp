@@ -106,7 +106,7 @@ export function endMoveHandler(
         figure.rank,
         prevState.playerColor,
         prevState.playerColor === 'white' ? 'black' : 'white',
-        prevState.promotionFigure || null,
+        null,
         [
           ...prevState.historyMoves,
           {
@@ -114,7 +114,8 @@ export function endMoveHandler(
             toPlaceCell:cellInBoard ,
             startCell: cell ,
           },
-        ]
+        ],
+        prevState
       );
       newBoard.reapplyBoard();
       newBoard.checkForChecks();
@@ -199,7 +200,7 @@ function endMoveWithoutDragging(
         figure.rank,
         prevState.playerColor,
         prevState.playerColor === 'white' ? 'black' : 'white',
-        prevState.promotionFigure || null,
+        null,
         [
           ...prevState.historyMoves,
           {
@@ -207,7 +208,8 @@ function endMoveWithoutDragging(
             toPlaceCell: toPlaceCell ,
             startCell: startingCell,
           },
-        ]
+        ],
+        prevState
       );
       newBoard.reapplyBoard();
       newBoard.checkForChecks();

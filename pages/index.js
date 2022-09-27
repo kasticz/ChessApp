@@ -17,7 +17,7 @@ import OptionsPanel from "../src/components/OptionsPanel";
 import { decideAiMove } from "../src/store/decideAiMove";
 import { allPieces } from "../src/classes/AllPieces";
 import Clock from "../src/components/Clock";
-import HistoryMoves from '../src/components/HistoryMoves.js'
+import HistoryMoves from "../src/components/HistoryMoves.js";
 
 export default function Home() {
   const [board, setBoard] = useState(null);
@@ -28,6 +28,7 @@ export default function Home() {
   const gameState = useSelector((state) => state.board.gameState);
   const gameId = useSelector((state) => state.board.gameId);
   const gameEndRef = useRef();
+  const [spinnerActive, setSpinnerActive] = useState(false);
 
   let startingCell = null;
 
@@ -54,7 +55,7 @@ export default function Home() {
             : board.promotionFigure[0]
           : "";
 
-        console.log(`${lastMoveStart}${lastMoveEnd}${promotionFigure}`);
+        // console.log(`${lastMoveStart}${lastMoveEnd}${promotionFigure}`);
 
         const resp = await fetch("./api/makeMove", {
           method: "POST",
@@ -67,15 +68,24 @@ export default function Home() {
           },
         });
       }
-      if(board?.lastMoveStart) makeMove()
+      if (board?.lastMoveStart) makeMove();
       if (board.gameEnd) {
         setGameEnd(board.gameEnd);
+      }
+
+      async function playSound(){
+        const audio = board.audio === 'standard' ? new Audio('/standard.mp3') : new Audio('/take.mp3')
+        audio.play()
+      }
+      if(board.audio){
+        playSound()
+
       }
     }
   }, [board]);
 
   useEffect(() => {
-    if(gameState){
+    if (gameState) {
       decideAiMove(gameState, board, setBoard, Board);
     }
   }, [gameState]);
@@ -105,7 +115,7 @@ export default function Home() {
   // console.log(gameState)
 
   function onClickHandler(e, figure, cell) {
-    if (!figure.playerFigure || board.whoToMove !== board.playerColor || !gameId) return;
+    if (!figure.playerFigure || board.whoToMove !== board.playerColor ||!gameId) return;
 
     if (
       startingCell &&
@@ -170,8 +180,7 @@ export default function Home() {
     const newFigure = new allPieces[piece](
       board.playerColor,
       board.cells[promotion.toPlaceCell.x][promotion.toPlaceCell.y],
-      board.playerColor === promotion.figure.color,
-      true
+      board.playerColor === promotion.figure.color
     );
     promotion.figure.makeMove(
       promotion.toPlaceCell,
@@ -192,12 +201,16 @@ export default function Home() {
         [
           ...prevState.historyMoves,
           {
-            figure: {rank: promotion.figure.rank, color: promotion.figure.color},
+            figure: {
+              rank: promotion.figure.rank,
+              color: promotion.figure.color,
+            },
             toPlaceCell: promotion.toPlaceCell,
             startCell: promotion.startCell,
-            promotionFigure: newFigure
+            promotionFigure: newFigure,
           },
-        ]
+        ],
+        prevState
       );
       newBoard.reapplyBoard();
       newBoard.checkForChecks();
@@ -206,11 +219,15 @@ export default function Home() {
     setPromotion(null);
   }
 
-  console.log(board)
+  // console.log(board)
 
   return (
     <div className={styles.app}>
-      <OptionsPanel Board={Board} setBoard={setBoard} />
+      <OptionsPanel
+        setSpinner={setSpinnerActive}
+        Board={Board}
+        setBoard={setBoard}
+      />
       <div ref={boardRef} className={styles.board}>
         {promotion && board && (
           <div className={styles[`${board?.playerColor || "white"}Promotion`]}>
@@ -247,8 +264,6 @@ export default function Home() {
 
         <BoardComp fn={onClickHandler} board={board} />
 
-
-
         {gameEnd && (
           <div
             ref={gameEndRef}
@@ -276,20 +291,33 @@ export default function Home() {
         )}
       </div>
       <div className={styles.uiWrapper}>
-          <Clock
-            board={board}
-            whoToMove={board?.whoToMove}
-            playerColor={board?.playerColor}
-            side={"opposite"}
-          />           
-          <HistoryMoves setBoard={setBoard}  history={board?.historyMoves || null}/>
-          <Clock
-            board={board}
-            whoToMove={board?.whoToMove}
-            playerColor={board?.playerColor}
-            side={"player"}
-          />
+        <Clock
+          board={board}
+          whoToMove={board?.whoToMove}
+          playerColor={board?.playerColor}
+          side={"opposite"}
+        />
+        <HistoryMoves
+          setBoard={setBoard}
+          history={board?.historyMoves || null}
+        />
+        <Clock
+          board={board}
+          whoToMove={board?.whoToMove}
+          playerColor={board?.playerColor}
+          side={"player"}
+        />
+      </div>
+      {spinnerActive && (
+        <div className="spinnerWrapper">
+          <div class="lds-ring">
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+          </div>
         </div>
+      )}
     </div>
   );
 }

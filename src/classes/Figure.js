@@ -24,6 +24,11 @@ export class Figure {
   }
 
   makeMove(toPlaceCell, startingCell) {
+    if(toPlaceCell.figure){
+      this.cell.board.audio = 'take'
+    }else{
+      this.cell.board.audio = 'standard'
+    }
     startingCell.placeFigure(null);
     this.cell = toPlaceCell;
     this.cell.placeFigure(this);

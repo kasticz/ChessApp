@@ -5,13 +5,12 @@ import styles from "./HistoryMoves.module.css";
 import { Fragment, useEffect, useRef, useState } from "react";
 
 export default function HistoryMoves(props) {
-  const gameState = useSelector(state=>state.board.gameState)
-  const gameId = useSelector(state=>state.board.gameId)
-  const historyRef = useRef(null)
-  
-  let historyList = null;
+  const gameState = useSelector((state) => state.board.gameState);
+  const gameId = useSelector((state) => state.board.gameId);
+  const historyRef = useRef(null);
+  const lastMove = useSelector((state) => state.board.gameState?.lastMove);
 
-  
+  let historyList = null;
 
   if (props.history && props.history.length > 0) {
     const hLength = Math.ceil(props.history.length / 2);
@@ -19,7 +18,6 @@ export default function HistoryMoves(props) {
     for (let i = 0; i < hLength; i++) {
       historyList.push(i);
     }
-
 
     const hWhite = [];
     const hBlack = [];
@@ -39,37 +37,44 @@ export default function HistoryMoves(props) {
         return item;
       })
       .map((item, i) => {
+        const isActiveW =
+          lastMove === item[0].notation || (!lastMove && gameState);
+        const isActiveB = lastMove && lastMove === item[1]?.notation;
         return (
-          <div key={Math.random()} className={styles.notationLine}>
+          <div key={Math.random()} className={`${styles.notationLine} `}>
             <div className={styles.moveNumber}>{++i}.</div>
-            <div className={styles.moveNotation}>
+            <div
+              className={`${styles.moveNotation} ${
+                isActiveW ? styles.activeLine : ""
+              }`}
+            >
               <img src={item[0].pieceImg} alt="" />
               <div>{item[0].notation}</div>
               {item[0].promImg && <img src={item[0].promImg} alt="" />}
             </div>
-            <div className={styles.moveNotation}>
+            <div
+              className={`${styles.moveNotation} ${
+                isActiveB ? styles.activeLine : ""
+              }`}
+            >
               {item[1]?.pieceImg && <img src={item[1].pieceImg} alt="" />}
               <div>{item[1]?.notation || ""}</div>
               {item[1]?.promImg && <img src={item[1].promImg} alt="" />}
             </div>
           </div>
         );
-      });    
-      
-      
-
+      });
   }
 
-  async function resign(){
+  async function resign() {
     const resp = await fetch("./api/resignGame", {
       method: "POST",
-      body: JSON.stringify({gameId}),
+      body: JSON.stringify({ gameId }),
       headers: {
-        'Content-type': "application/json",
+        "Content-type": "application/json",
       },
     });
-    const data = await resp.json()
-    console.log(data)
+    const data = await resp.json();
     props.setBoard((prevState) => {
       const newBoard = new Board(
         prevState.cells,
@@ -87,28 +92,34 @@ export default function HistoryMoves(props) {
     });
   }
 
-  useEffect(()=>{
+  useEffect(() => {
     setTimeout(() => {
-      historyRef.current.scrollTo({top:100000,behavior: 'smooth'})  
+      historyRef.current.scrollTo({ top: 100000, behavior: "smooth" });
     }, 70);
-  },[props.history])
-
-  
+  }, [props.history]);
 
   return (
     <Fragment>
-      <button onClick={resign}   className={`${!gameState ? styles.disabled: ''} ${styles.resign} `}>Сдаться</button>
-    <div ref={historyRef} className={styles.historyWrapper}>      
-      {historyList ? (
-        historyList
-      ) : (
-        <div className={styles.notationLine}>
-          <div className={styles.moveNumber}>{1}.</div>
-          <div className={styles.moveNotation}>?</div>
-          <div className={styles.moveNotation}>?</div>
-        </div>
+      {!props.puzzle && (
+        <button
+          onClick={resign}
+          disabled={!gameState}
+          className={`${!gameState ? styles.disabled : ""} ${styles.resign} `}
+        >
+          Сдаться
+        </button>
       )}
-    </div>
+      <div ref={historyRef} className={styles.historyWrapper}>
+        {historyList ? (
+          historyList
+        ) : (
+          <div className={styles.notationLine}>
+            <div className={styles.moveNumber}>{1}.</div>
+            <div className={styles.moveNotation}>?</div>
+            <div className={styles.moveNotation}>?</div>
+          </div>
+        )}
+      </div>
     </Fragment>
   );
 }

@@ -1,5 +1,5 @@
 .historyWrapper{
-    width: 400px;
+    width: 450px;
     height: 400px;
     display: flex; 
     align-items: flex-start;
@@ -22,12 +22,11 @@
 }
 
 .moveNotation{
-    width: 120px;       
+    width: 150px;       
     display: flex;
     align-items: center;
     border-radius: 16px;
     padding: 8px;
-    min-height: px;
     text-align-last: left;
 }
 .moveNotation img{
@@ -63,4 +62,7 @@
 .disabled,.disabled:hover,.disabled:active{
     background-color: #adadd3 ;
     cursor: not-allowed;
+}
+.activeLine{
+    background-color: rgba(148, 173, 219, 0.5) ;
 }

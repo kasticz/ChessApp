@@ -149,6 +149,11 @@ export class King extends Figure {
   }
 
   makeMove(toPlaceCell, startingCell, castling) {
+    if(toPlaceCell.figure){
+      this.cell.board.audio = 'take'
+    }else{
+      this.cell.board.audio = 'standard'
+    }
     if (castling?.verdict) {
       const currX = this.color === "white" ? 7 : 0;
 

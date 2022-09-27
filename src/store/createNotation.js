@@ -12,7 +12,7 @@ export function createNotation(startingCell,endCell,figure,promotionFigure){
 
     const start =`${yCoords[startingCell.y]}${xCoords[startingCell.x]}`
 
-    const finish = `${yCoords[endCell.y]}${xCoords[endCell.x]}`
+    const finish = `${yCoords[endCell.y]}${xCoords[endCell.x]}${promotionFigure ? promotionFigure.rank[0] : ''}`
 
 
     

@@ -39,6 +39,7 @@ export function decideAiMove(gameState, board, setBoard, Board) {
         ];
       const endCellInBoard =
         board.cells[Math.abs(+endCell[1] - 8)][+yCoords.indexOf(endCell[0])];
+
       const figureRank = startingCellInBoard.figure.rank;
       const f = startingCellInBoard.figure
 
@@ -47,24 +48,24 @@ export function decideAiMove(gameState, board, setBoard, Board) {
           ? startingCellInBoard.figure.validateMove(endCellInBoard)
           : null;
 
+      const promFigure =         promotionFigure && specialMoveCheck[2]
+      ? new allPieces[promotionFigure](
+          startingCellInBoard.figure.color,
+          endCellInBoard,
+          board.playerColor === startingCellInBoard.figure.color,
+          true
+        ) : null
+
       const specialMove = startingCellInBoard.figure.makeMove(
         endCellInBoard,
         startingCellInBoard,
         specialMoveCheck && specialMoveCheck[1]
           ? specialMoveCheck[1]
           : null,
-        promotionFigure && specialMoveCheck[2]
-          ? new allPieces[promotionFigure](
-              startingCellInBoard.figure.color,
-              endCellInBoard,
-              board.playerColor === startingCellInBoard.figure.color,
-              true
-            )
-          : null
+          promFigure 
       );
 
       setBoard((prevState) => {
-        console.log(prevState)
         const newBoard = new Board(
           prevState.cells,
           startingCellInBoard,
@@ -79,8 +80,10 @@ export function decideAiMove(gameState, board, setBoard, Board) {
               figure: {rank: f.rank, color: f.color},
               toPlaceCell: endCellInBoard ,
               startCell: startingCellInBoard,
+              promotionFigure: promFigure
             },
-          ]
+          ],
+          prevState
         );
         newBoard.reapplyBoard();
         newBoard.checkForChecks();
