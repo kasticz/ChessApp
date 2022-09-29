@@ -12,7 +12,7 @@ export class Queen extends Figure {
     const board = this.cell.board.cells;
 
     this.cell.placeFigure(
-      new Bishop(this.color, board[this.cell.x][this.cell.y], true)
+      new Bishop(this.color, board[this.cell.x][this.cell.y], this.playerFigure)
     );
 
     const bishopMovesVerdict = this.cell.figure.validateMove(
@@ -22,7 +22,7 @@ export class Queen extends Figure {
     );
 
     this.cell.placeFigure(
-      new Rook(this.color, board[this.cell.x][this.cell.y], true)
+      new Rook(this.color, board[this.cell.x][this.cell.y], this.playerFigure)
     );
 
     const rookMovesVerdict = this.cell.figure.validateMove(

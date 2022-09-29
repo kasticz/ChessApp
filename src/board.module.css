@@ -304,3 +304,31 @@
     position: relative;
 
 }
+.cookies{
+    position: absolute;
+    bottom:-20px;
+    left:50%;
+    transform: translateX(-50%);
+    font-size: 24px;
+    z-index: 2000;
+    background-color: white;
+    display: flex;
+    align-items: center;
+    border-radius:16px;
+    padding: 10px;
+    box-shadow: 5px 5px 5px gray;
+}
+.cookies button{
+    margin-left: 20px;
+    padding: 20px 40px;
+    background-color:#424291;
+    outline: none;
+    border: none;
+    color: white;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.cookies button:hover,.cookies button:active{
+    background-color: #5d5dbb;
+}

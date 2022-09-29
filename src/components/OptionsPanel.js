@@ -4,6 +4,7 @@ import { boardActions } from "../store/store";
 import whiteKing from "../assets/pieces/white_king.svg";
 import halfKing from "../assets/pieces/halfKing.svg";
 import blackKing from "../assets/pieces/black_king.svg";
+import { useCookies } from "react-cookie";
 import styles from "./OptionsPanel.module.css";
 
 export default function OptionsPanel(props) {
@@ -13,10 +14,13 @@ export default function OptionsPanel(props) {
   const [timeStart, setTimeStart] = useState(null);
   const [timeIncr, setTimeIncr] = useState(null);
 
+
   const gameState = useSelector(state=>state.board.gameState)
   const gameId = useSelector((state) => state.board.gameId);
 
   const dispatch = useDispatch();
+
+
 
   
 
@@ -43,14 +47,19 @@ export default function OptionsPanel(props) {
     const data = await resp.json();
 
     dispatch(boardActions.setGameId(data.id));
+    
 
+    
  
     const playingBoard = new props.Board();
     playingBoard.fillBoard(randomColor ? randomColor : side ? side : 'white');
     playingBoard.createFigures();
     props.setBoard(playingBoard);
     props.setSpinner(false)
+    const startAudio = new Audio('/start.mp3')
+    startAudio.play()
   }
+
 
   useEffect(()=>{
     async function startGameStream(){
@@ -93,7 +102,6 @@ export default function OptionsPanel(props) {
       const onComplete = () =>{
         dispatch(boardActions.setGameState(null))
         dispatch(boardActions.setGameId(null))
-
       } ;
   
       response.then(readStream(onMessage)).then(onComplete);
@@ -102,7 +110,8 @@ export default function OptionsPanel(props) {
   },[gameId])
 
   useEffect(()=>{
-    dispatch(boardActions.setGameTime(timeStart))
+    if(timeStart) dispatch(boardActions.setGameTime(timeStart))
+    
   },[timeStart])
 
   return (
@@ -312,7 +321,7 @@ export default function OptionsPanel(props) {
             </div>
           </div>
         </Fragment>
-        <button disabled={gameState} onClick={startGame} className={`${styles.beginGame} ${gameState ? styles.disabled : ''}`}>
+        <button disabled={gameState || !props.cookiesAccepted2} onClick={startGame} className={`${styles.beginGame} ${gameState || !props.cookiesAccepted2 ? styles.disabled : ''}`}>
           Начать игру
         </button>
       

@@ -18,6 +18,8 @@ import { decideAiMove } from "../src/store/decideAiMove";
 import { allPieces } from "../src/classes/AllPieces";
 import Clock from "../src/components/Clock";
 import HistoryMoves from "../src/components/HistoryMoves.js";
+import { useCookies } from "react-cookie";
+import { remakeBoard } from "../src/store/remakeBoard";
 
 export default function Home() {
   const [board, setBoard] = useState(null);
@@ -29,6 +31,17 @@ export default function Home() {
   const gameId = useSelector((state) => state.board.gameId);
   const gameEndRef = useRef();
   const [spinnerActive, setSpinnerActive] = useState(false);
+  const [cookiesAccepted,setCookiesAccepted] =  useCookies(["cookiesAccepted"])
+
+  const [cookiesAccepted2,setCookiesAccepted2] = useState(false)
+
+  const [cookie, setCookie, removeCookie] = useCookies(["gameId"]);
+
+  useEffect(()=>{
+    if(cookiesAccepted.cookiesAccepted){
+      setCookiesAccepted2(true)
+    }
+  },[cookiesAccepted])
 
   let startingCell = null;
 
@@ -38,6 +51,9 @@ export default function Home() {
       playingBoard.fillBoard("white");
       playingBoard.createFigures();
       setBoard(playingBoard);
+      if (cookie.gameId && !gameId) {
+        dispatch(boardActions.setGameId(cookie.gameId));
+      }
     } else {
       async function makeMove() {
         const xCoords = "87654321";
@@ -55,7 +71,7 @@ export default function Home() {
             : board.promotionFigure[0]
           : "";
 
-        // console.log(`${lastMoveStart}${lastMoveEnd}${promotionFigure}`);
+
 
         const resp = await fetch("./api/makeMove", {
           method: "POST",
@@ -68,24 +84,52 @@ export default function Home() {
           },
         });
       }
+
       if (board?.lastMoveStart) makeMove();
-      if (board.gameEnd) {
+      if (board?.gameEnd) {
         setGameEnd(board.gameEnd);
+        const audio = new Audio("/end.mp3");
+        audio.play();
+        if (cookie.gameId) {
+          removeCookie("gameId");
+        }
       }
 
-      async function playSound(){
-        const audio = board.audio === 'standard' ? new Audio('/standard.mp3') : new Audio('/take.mp3')
-        audio.play()
+      async function playSound() {
+        const audio =
+          board.audio === "standard"
+            ? new Audio("/standard.mp3")
+            : new Audio("/take.mp3");
+        audio.play();
       }
-      if(board.audio){
-        playSound()
-
+      if (board?.audio) {
+        playSound();
       }
     }
   }, [board]);
 
   useEffect(() => {
-    if (gameState) {
+    const shouldBeRemaked =
+      board?.historyMoves.length === 0 &&
+      (gameState?.moves.split(" ").length >= 2 ||
+        (gameState?.moves.split(" ").length >= 1 &&
+          board.playerColor !== "white"));
+
+    if (shouldBeRemaked) {
+      const playingBoard = new Board();
+      const decideColor = gameState.black?.id?.includes("caocao")
+        ? "black"
+        : "white";
+      playingBoard.fillBoard(decideColor);
+      playingBoard.createFigures();
+      const remakedBoard = remakeBoard(
+        playingBoard,
+        gameState.moves.split(" ")
+      );
+      setBoard(remakedBoard);
+    }
+
+    if (gameState && !shouldBeRemaked) {
       decideAiMove(gameState, board, setBoard, Board);
     }
   }, [gameState]);
@@ -112,10 +156,10 @@ export default function Home() {
       gameEndRef.current.focus();
     }
   }, [gameEnd]);
-  // console.log(gameState)
+
 
   function onClickHandler(e, figure, cell) {
-    if (!figure.playerFigure || board.whoToMove !== board.playerColor ||!gameId) return;
+    if (!figure.playerFigure || board.whoToMove !== board.playerColor || (!gameId && !cookie.gameId)) return;
 
     if (
       startingCell &&
@@ -196,7 +240,7 @@ export default function Home() {
         promotion.toPlaceCell,
         promotion.figure.rank,
         prevState.playerColor,
-        prevState.playerColor === "white" ? "black" : "white",
+        prevState.whoToMove === 'white' ? 'black' : 'white',
         newFigure.rank || null,
         [
           ...prevState.historyMoves,
@@ -217,9 +261,15 @@ export default function Home() {
       return newBoard;
     });
     setPromotion(null);
-  }
+  } 
 
-  // console.log(board)
+
+
+  useEffect(() => {
+    if (gameId && !cookie.gameId) {
+      setCookie("gameId", gameId);
+    }
+  }, [gameId]);
 
   return (
     <div className={styles.app}>
@@ -227,6 +277,7 @@ export default function Home() {
         setSpinner={setSpinnerActive}
         Board={Board}
         setBoard={setBoard}
+        cookiesAccepted2={cookiesAccepted2}
       />
       <div ref={boardRef} className={styles.board}>
         {promotion && board && (
@@ -274,7 +325,7 @@ export default function Home() {
             className={styles.gameEnd}
           >
             Игра Окончена! <hr />{" "}
-            {gameEnd.winner !== "Пат"
+            {gameEnd.winner !== "Пат" && gameEnd.winner !== "Ничья"
               ? `Выиграли ${gameEnd.winner}`
               : `${gameEnd.winner}`}
             <img
@@ -318,6 +369,11 @@ export default function Home() {
           </div>
         </div>
       )}
+      {!cookiesAccepted2 && <div className={styles.cookies}>
+        <p>Для работы сайта используются Cookie файлы</p>
+        <button onClick={()=>{setCookiesAccepted('cookiesAccepted',true)}}>Принять</button>
+      </div> }
+
     </div>
   );
 }

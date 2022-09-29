@@ -30,7 +30,8 @@ a {
   position: absolute;  
   display: flex;
   justify-content: center;
-  align-items:center
+  align-items:center;
+  background-color: rgba(122, 115, 115,0.3);
 }
 .lds-ring {
   display: inline-block;

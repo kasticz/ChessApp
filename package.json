@@ -10,8 +10,10 @@
   },
   "dependencies": {
     "@reduxjs/toolkit": "^1.8.5",
+    "flatted": "^3.2.7",
     "next": "12.3.0",
     "react": "18.2.0",
+    "react-cookie": "^4.1.1",
     "react-dom": "18.2.0",
     "react-redux": "^8.0.2"
   },

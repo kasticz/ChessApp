@@ -1,24 +1,29 @@
 import { allPieces } from "../classes/AllPieces";
 
-export function decideAiMove(gameState, board, setBoard, Board) {
-  if (board?.lastMoveStart || board?.playerColor === "black") {
+export function decideAiMove(gameState, board, setBoard, Board,moveToRemake) {
+  if (moveToRemake || board?.lastMoveStart || board?.playerColor === "black") {
     const xCoords = "87654321";
     const yCoords = "abcdefgh";
-    const lastMoveStart = board.lastMoveStart
+    const lastMoveStart = board?.lastMoveStart
       ? `${yCoords[board.lastMoveStart.y]}${xCoords[board.lastMoveStart.x]}`
       : "";
-    const lastMoveEnd = board.lastMoveStart
+    const lastMoveEnd = board?.lastMoveStart
       ? `${yCoords[board.lastMoveEnd.y]}${xCoords[board.lastMoveEnd.x]}`
       : "";
 
       const prFigure =  board.promotionFigure ? board.promotionFigure === 'knight' ? 'n' : board.promotionFigure[0] : ''
     const lastMove = `${lastMoveStart}${lastMoveEnd}${prFigure}`;
 
-    const gameLastMove = gameState.lastMove || gameState.state.moves;
+    const altMoves = gameState?.state?.moves.split(' ')
+    
+
+    const gameLastMove = moveToRemake ||  gameState?.lastMove ||( altMoves ? altMoves[altMoves.length - 1] : null) ;
+
+  
 
     
 
-    if (gameLastMove && gameLastMove !== lastMove) {
+    if ( moveToRemake || (gameLastMove && gameLastMove !== lastMove)) {
       const startingCell = gameLastMove.slice(0, 2);
       const endCell = gameLastMove.slice(2);
 
@@ -65,28 +70,33 @@ export function decideAiMove(gameState, board, setBoard, Board) {
           promFigure 
       );
 
+      const newBoard = new Board(
+        board.cells,
+        startingCellInBoard,
+        specialMove?.newToPlaceCell || endCellInBoard,
+        figureRank,
+        board.playerColor,
+        board.whoToMove === 'white' ? 'black' : 'white',
+        promotionFigure || null,
+        [
+          ...board.historyMoves || [],
+          {
+            figure: {rank: f.rank, color: f.color},
+            toPlaceCell: endCellInBoard ,
+            startCell: startingCellInBoard,
+            promotionFigure: promFigure
+          },
+        ],
+        board
+      );
+      newBoard.reapplyBoard();
+      newBoard.checkForChecks();
+
+      if(moveToRemake){
+        return newBoard
+      }
+
       setBoard((prevState) => {
-        const newBoard = new Board(
-          prevState.cells,
-          startingCellInBoard,
-          specialMove?.newToPlaceCell || endCellInBoard,
-          figureRank,
-          prevState.playerColor,
-          prevState.playerColor === "white" ? "white" : "black",
-          promotionFigure || null,
-          [
-            ...prevState.historyMoves || [],
-            {
-              figure: {rank: f.rank, color: f.color},
-              toPlaceCell: endCellInBoard ,
-              startCell: startingCellInBoard,
-              promotionFigure: promFigure
-            },
-          ],
-          prevState
-        );
-        newBoard.reapplyBoard();
-        newBoard.checkForChecks();
         return newBoard;
       });
     }

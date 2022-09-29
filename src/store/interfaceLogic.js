@@ -105,7 +105,7 @@ export function endMoveHandler(
         castlingCheck?.newToPlaceCell || cellInBoard,
         figure.rank,
         prevState.playerColor,
-        prevState.playerColor === 'white' ? 'black' : 'white',
+        prevState.whoToMove === 'white' ? 'black' : 'white',
         null,
         [
           ...prevState.historyMoves,
@@ -199,7 +199,7 @@ function endMoveWithoutDragging(
         castlingCheck?.newToPlaceCell || toPlaceCell,
         figure.rank,
         prevState.playerColor,
-        prevState.playerColor === 'white' ? 'black' : 'white',
+        prevState.whoToMove === 'white' ? 'black' : 'white',
         null,
         [
           ...prevState.historyMoves,

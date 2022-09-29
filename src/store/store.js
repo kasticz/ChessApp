@@ -16,11 +16,11 @@ const board = createSlice({
                 return
             }
             state.gameState = payload.payload   
-            const allMoves = payload.payload.moves?.split(' ') || ''       
+            const allMoves = payload.payload.moves?.split(' ') || payload.payload.state.moves?.split(' ')       
             state.gameState.lastMove = allMoves ?  allMoves[allMoves.length - 1]  : null
             if(!state.gameState.wtime){
-                state.gameState.wtime = state.gameState.clock.initial
-                state.gameState.btime = state.gameState.clock.initial
+                state.gameState.wtime = state.gameState.state.wtime
+                state.gameState.btime = state.gameState.state.btime
             }
             if(!state.incr){
                 state.incr = state.gameState.clock.increment / 1000

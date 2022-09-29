@@ -231,7 +231,7 @@ export default class Board {
               winner: kings[i].figure.color === "white" ? "чёрные" : "белые",
             };
             break;
-          }else{
+          }else if(kings[i].figure.color === this.whoToMove){
             this.gameEnd = {
               winner: 'Пат'
             };
@@ -241,5 +241,30 @@ export default class Board {
         }
       }
     }
+
+    const allFigures = this.cells.flat(1).filter(item=> item.figure)
+
+    const onlyTwoKings = allFigures.lenght === 2
+
+    const white = allFigures.filter(item => item.figure.color === 'white')
+
+    const black = allFigures.filter(item => item.figure.color === 'black')
+
+    const whiteCantWin = (white.length === 2 && (white.find(item => item.figure.rank === 'bishop') || white.find(item => item.figure.rank === 'knight')) || white.length === 1)
+
+    const blackCantWin= (black.length === 2 && (black.find(item => item.figure.rank === 'bishop') || black.find(item => item.figure.rank === 'knight')) || black.length === 1)
+
+
+    
+
+    if(onlyTwoKings || (whiteCantWin && blackCantWin)){
+      this.gameEnd = {
+        winner: 'Ничья'
+      };
+    }
+
+
+
+
   }
 }
