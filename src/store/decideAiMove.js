@@ -70,13 +70,15 @@ export function decideAiMove(gameState, board, setBoard, Board,moveToRemake) {
           promFigure 
       );
 
+      const whoToMove = board?.playerColor === 'black' ? 'black' : 'white'
+
       const newBoard = new Board(
         board.cells,
         startingCellInBoard,
         specialMove?.newToPlaceCell || endCellInBoard,
         figureRank,
         board.playerColor,
-        board.whoToMove === 'white' ? 'black' : 'white',
+        whoToMove,
         promotionFigure || null,
         [
           ...board.historyMoves || [],

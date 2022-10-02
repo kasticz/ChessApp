@@ -37,6 +37,12 @@ export default function Clock(props) {
       const movesLength = moves?.split(` `).length;
       if ((playerTimeActive || oppositeTimeActive) && movesLength >= 2) {
         if (timer) clearTimeout(timer);
+        if(timeLeft === 0 && !props.gameEnd){      
+          const isPlayerWon = playerTimeActive ? props.playerColor === 'white' ? 'чёрные' : 'белые' : null
+          const isOppWon = oppositeTimeActive ? props.playerColor === 'white' ? 'белые' : 'чёрные' : null
+          props.setGameEnd({winner: isPlayerWon ? isPlayerWon : isOppWon})
+          return
+        }
 
         const tServerPlayer =
           props.playerColor === "white" ? gameState.wtime : gameState.btime;
@@ -49,12 +55,12 @@ export default function Clock(props) {
         setTimer(
           setTimeout(() => {
             setTimeLeft((prevState) => (t ? t - 1 : prevState - 1));
-          }, 920)
+          }, 940)
         );
       } else if (!timePaused && movesLength >= 3) {
         if (timer) clearTimeout(timer);
         setTimePaused(true);
-        setTimeLeft((prevState) => prevState + incr);
+        setTimeLeft((prevState) => prevState + (incr ? incr : 0));
       }
     }
   }, [props.board, timeLeft]);

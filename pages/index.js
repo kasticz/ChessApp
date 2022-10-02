@@ -90,9 +90,6 @@ export default function Home() {
         setGameEnd(board.gameEnd);
         const audio = new Audio("/end.mp3");
         audio.play();
-        if (cookie.gameId) {
-          removeCookie("gameId");
-        }
       }
 
       async function playSound() {
@@ -132,6 +129,9 @@ export default function Home() {
     if (gameState && !shouldBeRemaked) {
       decideAiMove(gameState, board, setBoard, Board);
     }
+    if(gameState?.winner && !gameEnd){
+      setGameEnd({winner: gameState.winner === 'white' ? 'белые' : 'чёрные'})
+    }
   }, [gameState]);
 
   useEffect(() => {
@@ -153,12 +153,16 @@ export default function Home() {
       });
     }
     if (gameEnd) {
+      if (cookie.gameId) {
+        removeCookie("gameId");
+      }
       gameEndRef.current.focus();
     }
   }, [gameEnd]);
 
 
   function onClickHandler(e, figure, cell) {
+    console.log(figure,board,gameId,cookie)
     if (!figure.playerFigure || board.whoToMove !== board.playerColor || (!gameId && !cookie.gameId)) return;
 
     if (
@@ -266,13 +270,22 @@ export default function Home() {
 
 
   useEffect(() => {
-    if (gameId && !cookie.gameId) {
-      setCookie("gameId", gameId);
+    if (gameId && !cookie.gameId && gameState?.clock?.initial) {
+      const expirationDate = new Date(Date.now() + gameState.clock.initial * 2)
+      console.log(expirationDate)
+      setCookie("gameId", gameId,{
+        path: "/",
+        expires: expirationDate,
+      });
     }
-  }, [gameId]);
+  }, [gameId,gameState]);
+
+  console.log(gameState)
 
   return (
+    <Fragment>
     <div className={styles.app}>
+      <div className={styles.appWrapper}>
       <OptionsPanel
         setSpinner={setSpinnerActive}
         Board={Board}
@@ -344,9 +357,11 @@ export default function Home() {
       <div className={styles.uiWrapper}>
         <Clock
           board={board}
+          setGameEnd={setGameEnd}
           whoToMove={board?.whoToMove}
           playerColor={board?.playerColor}
           side={"opposite"}
+          gameEnd={gameEnd}
         />
         <HistoryMoves
           setBoard={setBoard}
@@ -354,14 +369,22 @@ export default function Home() {
         />
         <Clock
           board={board}
+          setGameEnd={setGameEnd}
           whoToMove={board?.whoToMove}
           playerColor={board?.playerColor}
           side={"player"}
+          gameEnd={gameEnd}          
         />
       </div>
-      {spinnerActive && (
+      {!cookiesAccepted2 && <div className={styles.cookies}>
+        <p>Для работы сайта используются Cookie файлы</p>
+        <button onClick={()=>{setCookiesAccepted('cookiesAccepted',true)}}>Принять</button>
+      </div> }
+      </div>
+    </div>
+    {spinnerActive && (
         <div className="spinnerWrapper">
-          <div class="lds-ring">
+          <div className="lds-ring">
             <div></div>
             <div></div>
             <div></div>
@@ -369,11 +392,6 @@ export default function Home() {
           </div>
         </div>
       )}
-      {!cookiesAccepted2 && <div className={styles.cookies}>
-        <p>Для работы сайта используются Cookie файлы</p>
-        <button onClick={()=>{setCookiesAccepted('cookiesAccepted',true)}}>Принять</button>
-      </div> }
-
-    </div>
+    </Fragment>
   );
 }

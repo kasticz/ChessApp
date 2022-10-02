@@ -8,7 +8,6 @@ import { useCookies } from "react-cookie";
 import styles from "./OptionsPanel.module.css";
 
 export default function OptionsPanel(props) {
-  // const [aiExpanded, setAiExpanded] = useState(false);
   const [side, setSide] = useState(null);
   const [diff, seDiff] = useState(null);
   const [timeStart, setTimeStart] = useState(null);

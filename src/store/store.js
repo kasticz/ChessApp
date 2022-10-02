@@ -16,21 +16,27 @@ const board = createSlice({
                 return
             }
             state.gameState = payload.payload   
-            const allMoves = payload.payload.moves?.split(' ') || payload.payload.state.moves?.split(' ')       
-            state.gameState.lastMove = allMoves ?  allMoves[allMoves.length - 1]  : null
-            if(!state.gameState.wtime){
-                state.gameState.wtime = state.gameState.state.wtime
-                state.gameState.btime = state.gameState.state.btime
+            if(!state.gameState.winner){
+                const allMoves = payload.payload.moves?.split(' ') || payload.payload.state.moves?.split(' ')       
+                state.gameState.lastMove = allMoves ?  allMoves[allMoves.length - 1]  : null
+                if(!state.gameState.wtime){
+                    state.gameState.wtime = state.gameState.state.wtime
+                    state.gameState.btime = state.gameState.state.btime
+                }
+                if(!state.incr && state.gameState.clock?.increment){
+                    state.incr = state.gameState.clock.increment / 1000                
+                }
+                if(!state?.initialTime && state.gameState?.clock?.initial){
+                    state.initialTime = state.gameState.clock.initial / 1000
+                }
+    
+                if(!state.gameState.moves){
+                    state.gameState.moves = state.gameState.state.moves
+                }
+                state.gameState.wtime = Math.round(state.gameState.wtime / 1000) 
+                state.gameState.btime = Math.round(state.gameState.btime / 1000) 
             }
-            if(!state.incr){
-                state.incr = state.gameState.clock.increment / 1000
-                state.initialTime = state.gameState.clock.initial / 1000
-            }
-            if(!state.gameState.moves){
-                state.gameState.moves = state.gameState.state.moves
-            }
-            state.gameState.wtime = Math.round(state.gameState.wtime / 1000) 
-            state.gameState.btime = Math.round(state.gameState.btime / 1000) 
+
         },
         setGameId(state,payload){
             state.gameId = payload.payload
