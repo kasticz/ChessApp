@@ -336,3 +336,22 @@
 .cookies button:hover,.cookies button:active{
     background-color: #5d5dbb;
 }
+
+.api{
+    position: absolute;
+    right: 10px;
+    bottom: -20px;
+    font-size: 20px;
+    display: flex;
+    align-items: center
+}
+.api img{
+    height: 50px;
+}
+.api a{
+    display: flex;
+    align-items: center
+}
+.api a:hover{
+    text-decoration: underline;
+}

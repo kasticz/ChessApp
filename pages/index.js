@@ -395,6 +395,7 @@ export default function Home() {
             </div>
           )}
         </div>
+        <div className={styles.api}> Сделано с помощью <a className={styles.apiLink} href="https://lichess.org/api"> <img src="https://lichess1.org/assets/logo/lichess-pad12.svg" alt="" />  Lichess API</a></div>
       </div>
       {spinnerActive && (
         <div className="spinnerWrapper">
