@@ -1,4 +1,5 @@
 import { useDispatch, useSelector } from "react-redux";
+import Head from 'next/head'
 import Board from "../src/classes/Board";
 import BoardComp from "../src/components/BoardComp";
 import { useState, useEffect, useRef, Fragment } from "react";
@@ -31,17 +32,17 @@ export default function Home() {
   const gameId = useSelector((state) => state.board.gameId);
   const gameEndRef = useRef();
   const [spinnerActive, setSpinnerActive] = useState(false);
-  const [cookiesAccepted,setCookiesAccepted] =  useCookies(["cookiesAccepted"])
+  const [cookiesAccepted, setCookiesAccepted] = useCookies(["cookiesAccepted"]);
 
-  const [cookiesAccepted2,setCookiesAccepted2] = useState(false)
+  const [cookiesAccepted2, setCookiesAccepted2] = useState(false);
 
   const [cookie, setCookie, removeCookie] = useCookies(["gameId"]);
 
-  useEffect(()=>{
-    if(cookiesAccepted.cookiesAccepted){
-      setCookiesAccepted2(true)
+  useEffect(() => {
+    if (cookiesAccepted.cookiesAccepted) {
+      setCookiesAccepted2(true);
     }
-  },[cookiesAccepted])
+  }, [cookiesAccepted]);
 
   let startingCell = null;
 
@@ -70,8 +71,6 @@ export default function Home() {
             ? "n"
             : board.promotionFigure[0]
           : "";
-
-
 
         const resp = await fetch("./api/makeMove", {
           method: "POST",
@@ -129,8 +128,8 @@ export default function Home() {
     if (gameState && !shouldBeRemaked) {
       decideAiMove(gameState, board, setBoard, Board);
     }
-    if(gameState?.winner && !gameEnd){
-      setGameEnd({winner: gameState.winner === 'white' ? 'белые' : 'чёрные'})
+    if (gameState?.winner && !gameEnd) {
+      setGameEnd({ winner: gameState.winner === "white" ? "белые" : "чёрные" });
     }
   }, [gameState]);
 
@@ -160,10 +159,13 @@ export default function Home() {
     }
   }, [gameEnd]);
 
-
   function onClickHandler(e, figure, cell) {
-    console.log(figure,board,gameId,cookie)
-    if (!figure.playerFigure || board.whoToMove !== board.playerColor || (!gameId && !cookie.gameId)) return;
+    if (
+      !figure.playerFigure ||
+      board.whoToMove !== board.playerColor ||
+      (!gameId && !cookie.gameId)
+    )
+      return;
 
     if (
       startingCell &&
@@ -244,7 +246,7 @@ export default function Home() {
         promotion.toPlaceCell,
         promotion.figure.rank,
         prevState.playerColor,
-        prevState.whoToMove === 'white' ? 'black' : 'white',
+        prevState.whoToMove === "white" ? "black" : "white",
         newFigure.rank || null,
         [
           ...prevState.historyMoves,
@@ -265,124 +267,136 @@ export default function Home() {
       return newBoard;
     });
     setPromotion(null);
-  } 
-
-
+  }
 
   useEffect(() => {
     if (gameId && !cookie.gameId && gameState?.clock?.initial) {
-      const expirationDate = new Date(Date.now() + gameState.clock.initial * 2)
-      console.log(expirationDate)
-      setCookie("gameId", gameId,{
+      const expirationDate = new Date(Date.now() + gameState.clock.initial * 2);
+      setCookie("gameId", gameId, {
         path: "/",
         expires: expirationDate,
       });
     }
-  }, [gameId,gameState]);
-
-  console.log(gameState)
+  }, [gameId, gameState]);
 
   return (
     <Fragment>
-    <div className={styles.app}>
-      <div className={styles.appWrapper}>
-      <OptionsPanel
-        setSpinner={setSpinnerActive}
-        Board={Board}
-        setBoard={setBoard}
-        cookiesAccepted2={cookiesAccepted2}
-      />
-      <div ref={boardRef} className={styles.board}>
-        {promotion && board && (
-          <div className={styles[`${board?.playerColor || "white"}Promotion`]}>
-            <img
-              onClick={() => {
-                promote("queen");
-              }}
-              src={piecesImgs[`${board.playerColor}_queen`]}
-              alt=""
+      <Head>
+        <link rel="shortcut icon" href="/favicon.ico" />
+        <meta charSet="UTF-8" />
+        <meta httpEquiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Шахматы</title>
+      </Head>
+      <div className={styles.app}>
+        <div className={styles.appWrapper}>
+          <OptionsPanel
+            setSpinner={setSpinnerActive}
+            Board={Board}
+            setBoard={setBoard}
+            cookiesAccepted2={cookiesAccepted2}
+          />
+          <div ref={boardRef} className={styles.board}>
+            {promotion && board && (
+              <div
+                className={styles[`${board?.playerColor || "white"}Promotion`]}
+              >
+                <img
+                  onClick={() => {
+                    promote("queen");
+                  }}
+                  src={piecesImgs[`${board.playerColor}_queen`]}
+                  alt=""
+                />
+                <img
+                  onClick={() => {
+                    promote("knight");
+                  }}
+                  src={piecesImgs[`${board.playerColor}_knight`]}
+                  alt=""
+                />
+                <img
+                  onClick={() => {
+                    promote("rook");
+                  }}
+                  src={piecesImgs[`${board.playerColor}_rook`]}
+                  alt=""
+                />
+                <img
+                  onClick={() => {
+                    promote("bishop");
+                  }}
+                  src={piecesImgs[`${board.playerColor}_bishop`]}
+                  alt=""
+                />
+              </div>
+            )}
+
+            <BoardComp fn={onClickHandler} board={board} />
+
+            {gameEnd && (
+              <div
+                ref={gameEndRef}
+                tabIndex={5}
+                onBlur={() => {
+                  setGameEnd(false);
+                }}
+                className={styles.gameEnd}
+              >
+                Игра Окончена! <hr />{" "}
+                {gameEnd.winner !== "Пат" && gameEnd.winner !== "Ничья"
+                  ? `Выиграли ${gameEnd.winner}`
+                  : `${gameEnd.winner}`}
+                <img
+                  src={
+                    gameEnd.winner === "чёрные"
+                      ? blackWon.src
+                      : gameEnd.winner === "белые"
+                      ? whiteWon.src
+                      : draw.src
+                  }
+                  alt=""
+                />
+              </div>
+            )}
+          </div>
+          <div className={styles.uiWrapper}>
+            <Clock
+              board={board}
+              setGameEnd={setGameEnd}
+              whoToMove={board?.whoToMove}
+              playerColor={board?.playerColor}
+              side={"opposite"}
+              gameEnd={gameEnd}
             />
-            <img
-              onClick={() => {
-                promote("knight");
-              }}
-              src={piecesImgs[`${board.playerColor}_knight`]}
-              alt=""
+            <HistoryMoves
+              setBoard={setBoard}
+              history={board?.historyMoves || null}
             />
-            <img
-              onClick={() => {
-                promote("rook");
-              }}
-              src={piecesImgs[`${board.playerColor}_rook`]}
-              alt=""
-            />
-            <img
-              onClick={() => {
-                promote("bishop");
-              }}
-              src={piecesImgs[`${board.playerColor}_bishop`]}
-              alt=""
+            <Clock
+              board={board}
+              setGameEnd={setGameEnd}
+              whoToMove={board?.whoToMove}
+              playerColor={board?.playerColor}
+              side={"player"}
+              gameEnd={gameEnd}
             />
           </div>
-        )}
-
-        <BoardComp fn={onClickHandler} board={board} />
-
-        {gameEnd && (
-          <div
-            ref={gameEndRef}
-            tabIndex={5}
-            onBlur={() => {
-              setGameEnd(false);
-            }}
-            className={styles.gameEnd}
-          >
-            Игра Окончена! <hr />{" "}
-            {gameEnd.winner !== "Пат" && gameEnd.winner !== "Ничья"
-              ? `Выиграли ${gameEnd.winner}`
-              : `${gameEnd.winner}`}
-            <img
-              src={
-                gameEnd.winner === "чёрные"
-                  ? blackWon.src
-                  : gameEnd.winner === "белые"
-                  ? whiteWon.src
-                  : draw.src
-              }
-              alt=""
-            />
-          </div>
-        )}
+          {!cookiesAccepted2 && (
+            <div className={styles.cookies}>
+              <p>Для работы сайта используются Cookie файлы</p>
+              <button
+                onClick={() => {
+                  setCookiesAccepted("cookiesAccepted", true);
+                }}
+              >
+                Принять
+              </button>
+            </div>
+          )}
+        </div>
       </div>
-      <div className={styles.uiWrapper}>
-        <Clock
-          board={board}
-          setGameEnd={setGameEnd}
-          whoToMove={board?.whoToMove}
-          playerColor={board?.playerColor}
-          side={"opposite"}
-          gameEnd={gameEnd}
-        />
-        <HistoryMoves
-          setBoard={setBoard}
-          history={board?.historyMoves || null}
-        />
-        <Clock
-          board={board}
-          setGameEnd={setGameEnd}
-          whoToMove={board?.whoToMove}
-          playerColor={board?.playerColor}
-          side={"player"}
-          gameEnd={gameEnd}          
-        />
-      </div>
-      {!cookiesAccepted2 && <div className={styles.cookies}>
-        <p>Для работы сайта используются Cookie файлы</p>
-        <button onClick={()=>{setCookiesAccepted('cookiesAccepted',true)}}>Принять</button>
-      </div> }
-      </div>
-    </div>
-    {spinnerActive && (
+      {spinnerActive && (
         <div className="spinnerWrapper">
           <div className="lds-ring">
             <div></div>
