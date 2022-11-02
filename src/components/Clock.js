@@ -17,9 +17,12 @@ export default function Clock(props) {
     props.playerColor === "white" ? gameState?.btime : gameState?.wtime;
   const serverTime = props.side === "player" ? tServerPlayer : tServerOpp;
 
+
   const [timeLeft, setTimeLeft] = useState(serverTime || preGameTime || 300);
   const [timePaused, setTimePaused] = useState(true);
   const [timer, setTimer] = useState();
+  
+
 
   useEffect(() => {
     if (!gameState && preGameTime && !id.gameId) {
@@ -63,7 +66,9 @@ export default function Clock(props) {
         setTimeLeft((prevState) => prevState + (incr ? incr : 0));
       }
     }
-  }, [props.board, timeLeft]);
+  }, [props.whoToMove, timeLeft]);
+
+
 
   const minutes = Math.floor(timeLeft / 60);
 

@@ -133,6 +133,8 @@ export default function Home() {
     }
   }, [gameState]);
 
+
+
   useEffect(() => {
     if (board?.whoToMove && gameEnd) {
       setBoard((prevState) => {

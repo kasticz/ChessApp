@@ -15,6 +15,9 @@ const board = createSlice({
                 state.gameState = null
                 return
             }
+            if(payload.payload.type ==='opponentGone'){
+                return;
+            }
             state.gameState = payload.payload   
             if(!state.gameState.winner){
                 const allMoves = payload.payload.moves?.split(' ') || payload.payload.state.moves?.split(' ')       
